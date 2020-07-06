@@ -6,7 +6,10 @@ from typing import List
 
 import rospy
 from can_msgs.msg import Frame
+from std_msgs.msg import Float32
 
+
+from karelics_vesc_can_driver.msg import VescStatus
 
 class CanIds(IntEnum):
     CAN_PACKET_SET_DUTY = 0
@@ -43,9 +46,9 @@ class CanIds(IntEnum):
     CAN_PACKET_SHUTDOWN = 31
 
 
-class VescState:
+class VescInterface:
 
-    def __init__(self, vesc_id):
+    def __init__(self, vesc_id, send_function):
         self.vesc_id = vesc_id
 
         # Status message
@@ -67,6 +70,39 @@ class VescState:
         self.tacho_value = 0
         self.v_in = 0
 
+        # Subscribe to cmd topics
+        self.current_sub_   = rospy.Subscriber("vesc_%i/motor_current" % self.vesc_id, Float32, self.set_current_cb)
+        self.brake_sub_     = rospy.Subscriber("vesc_%i/motor_brake" % self.vesc_id, Float32, self.set_brake_cb)
+        self.speed_sub_     = rospy.Subscriber("vesc_%i/motor_speed" % self.vesc_id, Float32, self.set_speed_cb)
+        self.position_sub_  = rospy.Subscriber("vesc_%i/motor_position" % self.vesc_id, Float32, self.set_position_cb)
+
+        # Setup vesc status publischer
+        self.status_pub = rospy.Publisher("vesc_%i/status" % self.vesc_id, VescStatus, queue_size=1)
+
+        self.send_cb = send_function
+
+    def publish_status(self):
+
+        status_msg = VescStatus()
+        status_msg.erpm = int(self.erpm)
+        status_msg.duty_cycle = self.duty_cycle
+        status_msg.current = self.current
+        status_msg.amp_hours = self.amp_hours
+        status_msg.amp_hours_charged = self.amp_hours_charged
+        status_msg.watt_hours = self.watt_hours
+        status_msg.watt_hours_charged = self.watt_hours_charged
+        status_msg.temp_fet = self.temp_fet
+        status_msg.temp_motor = self.temp_motor
+        status_msg.current_in = self.current_in
+        status_msg.pid_pos_now = self.pid_pos_now
+        status_msg.tacho_value = self.tacho_value
+        status_msg.v_in = self.v_in
+
+        self.status_pub.publish(status_msg)
+
+    def set_send_cb(self, send_function):
+        self.send_cb = send_function
+
     def __str__(self):
         string = "VESC[%i]: \n" % self.vesc_id
         string += "erpm: %i duty: %f  current: %i  \n" % ( self.erpm, self.duty_cycle, self.current)
@@ -76,30 +112,70 @@ class VescState:
         string += "tacho_value: %f v_in: %f \n" % (self.tacho_value, self.v_in)
         return string
 
+    def set_current_cb(self, msg: Float32):
+        pass
+
+    def set_brake_cb(self, msg: Float32):
+        pass
+
+    def set_speed_cb(self, msg: Float32):
+
+        dutycyle_msg = VesSetDuty()
+        dutycyle_msg.set_duty(msg.data)
+
+        can_msg = Frame()
+        can_msg.is_extended = True
+        can_msg.dlc = 4
+        can_msg.id = dutycyle_msg.get_encoded_msg_id(self.vesc_id)
+        can_msg.data = dutycyle_msg.get_encoded_msg()
+        self.send_cb(can_msg)
+
+    def set_position_cb(self, msg: Float32):
+        pass
+
 
 class CanMsg(metaclass=ABCMeta):
 
     def __init__(self, msg_id):
         self.msg_id = msg_id
-        self.buffer = bytes()
+        self.in_buffer = bytes()
+        self.out_buffer= bytearray()
         self.pointer = 0
         self.on_update_func = None
 
     def pop_int32(self):
-        data = struct.unpack(">i", self.buffer[self.pointer:self.pointer+4])[0]
+        data = struct.unpack(">i", self.in_buffer[self.pointer:self.pointer + 4])[0]
         self.pointer += 4
         return data
 
     def pop_int16(self):
-        data = struct.unpack(">h", self.buffer[self.pointer:self.pointer+2])[0]
+        data = struct.unpack(">h", self.in_buffer[self.pointer:self.pointer + 2])[0]
         self.pointer += 2
         return data
 
     def set_data(self, data: bytes):
         self.pointer = 0
-        self.buffer = data
+        self.in_buffer = data
 
     def process_msg(self, data):
+        pass
+
+    def start_msg(self):
+        self.out_buffer = bytearray()
+
+    def encode_int32(self, value):
+        for b in struct.pack(">i", value):
+            self.out_buffer.append(b)
+
+    def encode_uint32(self, value):
+        for b in struct.pack(">I", value):
+            self.out_buffer.append(b)
+
+    def get_encoded_msg_id(self, controller_id):
+
+        return controller_id | (self.msg_id << 8)
+
+    def get_encoded_msg(self):
         pass
 
 
@@ -118,7 +194,7 @@ class VescStatusMsg(CanMsg):
         self.duty_cycle = self.pop_int16() / 1000.0
         return self
 
-    def update_vesc_state(self, vesc: VescState):
+    def update_vesc_state(self, vesc: VescInterface):
         vesc.erpm = self.erpm
         vesc.current = self.current
         vesc.duty_cycle = self.duty_cycle
@@ -132,7 +208,7 @@ class VescStatus2Msg(CanMsg):
         self.amp_hours = 0
         self.amp_hours_charged = 0
 
-    def update_vesc_state(self, vesc: VescState):
+    def update_vesc_state(self, vesc: VescInterface):
         vesc.amp_hours = self.amp_hours
         vesc.amp_hours_charged = self.amp_hours_charged
 
@@ -151,7 +227,7 @@ class VescStatus3Msg(CanMsg):
         self.watt_hours = 0
         self.watt_hours_charged = 0
 
-    def update_vesc_state(self, vesc: VescState):
+    def update_vesc_state(self, vesc: VescInterface):
         vesc.watt_hours = self.watt_hours
         vesc.watt_hours_charged = self.watt_hours_charged
 
@@ -172,7 +248,7 @@ class VescStatus4Msg(CanMsg):
         self.current_in = 0
         self.pid_pos_now = 0
 
-    def update_vesc_state(self, vesc: VescState):
+    def update_vesc_state(self, vesc: VescInterface):
         vesc.temp_fet = self.temp_fet
         vesc.temp_motor = self.temp_motor
         vesc.current_in = self.current_in
@@ -195,7 +271,7 @@ class VescStatus5Msg(CanMsg):
         self.tacho_value = 0
         self.v_in = 0
 
-    def update_vesc_state(self, vesc: VescState):
+    def update_vesc_state(self, vesc: VescInterface):
         vesc.tacho_value = self.tacho_value
         vesc.v_in = self.v_in
 
@@ -204,6 +280,21 @@ class VescStatus5Msg(CanMsg):
         self.tacho_value = self.pop_int32()
         self.v_in = self.pop_int16() / 1e1
         return self
+
+
+class VesSetDuty(CanMsg):
+
+    def __init__(self):
+        super(VesSetDuty, self).__init__(msg_id=CanIds.CAN_PACKET_SET_DUTY)
+        self.duty_cycle = 0
+
+    def set_duty(self, duty):
+        self.duty_cycle = duty
+
+    def get_encoded_msg(self):
+        self.start_msg()
+        self.encode_int32( int(self.duty_cycle*100000))
+        return self.out_buffer
 
 
 class CanMessageHandler:
@@ -216,7 +307,6 @@ class CanMessageHandler:
         self.known_messages_ids.append(msg.msg_id)
         self.known_messages.append(msg)
 
-
     def process_message(self, msg_id: int, data: bytes):
 
         if msg_id in self.known_messages_ids:
@@ -228,22 +318,17 @@ class CanMessageHandler:
 class VescCanDriver:
 
     known_vesc_ids = []
-    known_vescs = []  # type: List[VescState]
+    known_vescs = []  # type: List[VescInterface]
 
     def __init__(self):
 
         # Subscribe to can topics
         rospy.Subscriber("/received_messages", Frame, callback=self.can_cb)
 
-        # Subscribe to cmd topics
-        self.current_sub_ = nh.subscribe("commands/motor/current", 10, & VescDriver::currentCallback, this);
-        self.brake_sub_ = nh.subscribe("commands/motor/brake", 10, & VescDriver::brakeCallback, this);
-        self.speed_sub_ = nh.subscribe("commands/motor/speed", 10, & VescDriver::speedCallback, this);
-        self.position_sub_ = nh.subscribe("commands/motor/position", 10, & VescDriver::positionCallback, this);
-        self.servo_sub_ = nh.subscribe("commands/servo/position", 10, & VescDriver::servoCallback, this);
-
         # Make publisher to send can messages
-        self.send_can_msg = rospy.Publisher("sent_messages", Frame, queue_size=1)
+        self.send_can_msg_pub = rospy.Publisher("sent_messages", Frame, queue_size=1)
+
+
 
         # Initialize CAN message handler and add message types
         self.can_msg_handler = CanMessageHandler()
@@ -271,7 +356,8 @@ class VescCanDriver:
 
         if controller_id not in self.known_vesc_ids:
             self.known_vesc_ids.append(controller_id)
-            self.known_vescs.append(VescState(controller_id))
+            self.known_vescs.append(VescInterface(vesc_id=controller_id,
+                                                  send_function=self.send_can_msg_pub.publish))
 
         controller_idx = self.known_vesc_ids.index(controller_id)
         current_vesc = self.known_vescs[controller_idx]
@@ -285,8 +371,8 @@ class VescCanDriver:
 
         # Debug output
         for vesc in self.known_vescs:
-            print(vesc)
-
+            # print(vesc)
+            vesc.publish_status()
 
 
 if __name__ == '__main__':
