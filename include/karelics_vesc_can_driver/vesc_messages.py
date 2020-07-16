@@ -8,6 +8,10 @@ from karelics_vesc_can_driver.vesc import Vesc
 
 
 class CanIds(IntEnum):
+    """
+    Can id's from: 
+    https://github.com/vedderb/vesc_tool/blob/87565a40802707bcdd1432f4f470b7a4364a9a82/datatypes.h
+    """
     CAN_PACKET_SET_DUTY = 0
     CAN_PACKET_SET_CURRENT = 1
     CAN_PACKET_SET_CURRENT_BRAKE = 2
@@ -43,6 +47,12 @@ class CanIds(IntEnum):
 
 
 class CanMsg(metaclass=ABCMeta):
+    """
+    Interface defining the common fuctions for encoding and decoding can messages from the VESC.
+    
+    This class should not be used directly but should always be inherited from.
+    
+    """
 
     def __init__(self, msg_id):
         self.msg_id = msg_id
@@ -51,6 +61,9 @@ class CanMsg(metaclass=ABCMeta):
         self.pointer = 0
         self.on_update_func = None
 
+    """
+    Decoding
+    """
     def pop_int32(self):
         data = struct.unpack(">i", self.in_buffer[self.pointer:self.pointer + 4])[0]
         self.pointer += 4
@@ -60,17 +73,10 @@ class CanMsg(metaclass=ABCMeta):
         data = struct.unpack(">h", self.in_buffer[self.pointer:self.pointer + 2])[0]
         self.pointer += 2
         return data
-
-    def set_data(self, data: bytes):
-        self.pointer = 0
-        self.in_buffer = data
-
-    def process_msg(self, data):
-        pass
-
-    def start_msg(self):
-        self.out_buffer = bytearray()
-
+    
+    """
+    Encoding
+    """    
     def encode_int32(self, value):
         for b in struct.pack(">i", value):
             self.out_buffer.append(b)
@@ -82,6 +88,19 @@ class CanMsg(metaclass=ABCMeta):
     def encode_float32(self, value):
         for b in struct.pack(">f", value):
             self.out_buffer.append(b)
+            
+    def set_data(self, data: bytes):
+        self.pointer = 0
+        self.in_buffer = data
+
+    def process_msg(self, data):
+        """
+        This function should be implemented in the derived class.
+        """
+        pass
+
+    def start_msg(self):
+        self.out_buffer = bytearray()
 
     @staticmethod
     def decode_frame_id(frame: Frame):
