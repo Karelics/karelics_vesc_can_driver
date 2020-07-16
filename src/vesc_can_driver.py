@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import struct
 from typing import List
 
 import rospy
@@ -59,21 +58,28 @@ class VescCanDriver:
 
     def can_cb(self, msg: Frame):
         """
-        Build after comm_can.c
-        :param msg:
-        :return:
+        Callback for the /recieved_msg topic published by the roscan_bridge.
+        :param msg: The Can message
+        :return: none
+
+        In this callback the message ID is decoded into a vesc_id and can_msg_id.
+        The can message is then decoded and the data is fed into Vesc object holding the
+        state of that specific Vesc controller.
+
         """
-        controller_id = msg.id & 0xFF
-        can_msg_id = (msg.id >> 8)
+        [vesc_id, can_msg_id] = CanMsg.decode_frame_id(msg)
 
-        if controller_id not in self.known_vesc_ids:
-            self.known_vesc_ids.append(controller_id)
-            self.known_vescs.append(Vesc(vesc_id=controller_id,
-                                                  send_function=self.send_can_msg_pub.publish))
+        # Check if we already know the vesc this message comes from, if not add it to the known vesc
+        if vesc_id not in self.known_vesc_ids:
+            self.known_vesc_ids.append(vesc_id)
+            self.known_vescs.append(Vesc(vesc_id=vesc_id,
+                                         send_function=self.send_can_msg_pub.publish))
 
-        controller_idx = self.known_vesc_ids.index(controller_id)
+        # Get the index of the current vesc
+        controller_idx = self.known_vesc_ids.index(vesc_id)
         current_vesc = self.known_vescs[controller_idx]
 
+        # Decode message and update corresponding vesc object
         try:
             msg = self.can_msg_handler.process_message(msg_id=can_msg_id, data=msg.data)
             msg.update_vesc_state(current_vesc)
@@ -81,9 +87,8 @@ class VescCanDriver:
         except NameError as e:
             rospy.loginfo(str(e))
 
-        # Debug output
+        # Publish the current status of the vescs in to ros world
         for vesc in self.known_vescs:
-            # print(vesc)
             vesc.publish_status()
 
 

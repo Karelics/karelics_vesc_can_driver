@@ -1,7 +1,7 @@
 
 import rospy
 
-from std_msgs.msg import Float32
+from std_msgs.msg import Float32, Header
 
 from karelics_vesc_can_driver.msg import VescStatus
 
@@ -35,15 +35,14 @@ class Vesc:
         self.v_in = 0
 
         # Subscribe to cmd topics
-        rospy.Subscriber("vesc_%i/current" % self.vesc_id, Float32, self.set_current_cb)
-        rospy.Subscriber("vesc_%i/brake_current" % self.vesc_id, Float32, self.set_brake_cb)
-        rospy.Subscriber("vesc_%i/duty_cycle" % self.vesc_id, Float32, self.set_duty_cycle_cb)
-        rospy.Subscriber("vesc_%i/position" % self.vesc_id, Float32, self.set_position_cb)
-        rospy.Subscriber("vesc_%i/erpm" % self.vesc_id, Float32, self.set_erpm_cb)
-        rospy.Subscriber("vesc_%i/rpm" % self.vesc_id, Float32, self.set_rpm_cb)
+        rospy.Subscriber("vesc_%i/set/current" % self.vesc_id, Float32, self.set_current_cb)
+        rospy.Subscriber("vesc_%i/set/brake_current" % self.vesc_id, Float32, self.set_brake_cb)
+        rospy.Subscriber("vesc_%i/set/duty_cycle" % self.vesc_id, Float32, self.set_duty_cycle_cb)
+        rospy.Subscriber("vesc_%i/set/position" % self.vesc_id, Float32, self.set_position_cb)
+        rospy.Subscriber("vesc_%i/set/erpm" % self.vesc_id, Float32, self.set_erpm_cb)
+        rospy.Subscriber("vesc_%i/set/rpm" % self.vesc_id, Float32, self.set_rpm_cb)
 
-
-        # Setup vesc status publischer
+        # Setup vesc status Publisher
         self.status_pub = rospy.Publisher("vesc_%i/status" % self.vesc_id, VescStatus, queue_size=1)
 
         self.send_cb = send_function
@@ -51,6 +50,9 @@ class Vesc:
     def publish_status(self):
 
         status_msg = VescStatus()
+        status_msg.header = Header()
+        status_msg.header.stamp = rospy.Time.now()
+
         status_msg.erpm = int(self.erpm)
         status_msg.rpm = int(self.erpm / self.motor_poles)
         status_msg.duty_cycle = self.duty_cycle

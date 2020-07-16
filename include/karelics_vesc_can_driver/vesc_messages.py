@@ -1,5 +1,8 @@
+import struct
 from abc import ABCMeta
 from enum import IntEnum
+
+from can_msgs.msg import Frame
 
 from karelics_vesc_can_driver.vesc import Vesc
 
@@ -37,7 +40,6 @@ class CanIds(IntEnum):
     CAN_PACKET_CONF_BATTERY_CUT = 29
     CAN_PACKET_CONF_STORE_BATTERY_CUT = 30
     CAN_PACKET_SHUTDOWN = 31
-
 
 
 class CanMsg(metaclass=ABCMeta):
@@ -80,6 +82,12 @@ class CanMsg(metaclass=ABCMeta):
     def encode_float32(self, value):
         for b in struct.pack(">f", value):
             self.out_buffer.append(b)
+
+    @staticmethod
+    def decode_frame_id(frame: Frame):
+        vesc_id = frame.id & 0xFF
+        can_msg_id = (frame.id >> 8)
+        return [vesc_id, can_msg_id]
 
     def get_encoded_msg_id(self, controller_id):
 
