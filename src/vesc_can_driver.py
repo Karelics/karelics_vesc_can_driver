@@ -7,7 +7,7 @@ import rospy
 from can_msgs.msg import Frame
 
 from karelics_vesc_can_driver.vesc_messages import *
-from karelics_vesc_can_driver.vesc import Vesc
+from karelics_vesc_can_driver.vesc import *
 
 
 class CanMessageHandler:

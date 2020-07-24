@@ -102,11 +102,11 @@ class Vesc:
         self.send_cb(pos_msg.get_can_msg(self.vesc_id))
 
     def set_erpm_cb(self, msg: Float32):
-        rpm_msg = VesSetRPM(rpm=msg.data)
+        rpm_msg = VescSetRPM(rpm=msg.data)
         self.send_cb(rpm_msg.get_can_msg(self.vesc_id))
         pass
 
     def set_rpm_cb(self, msg: Float32):
-        rpm_msg = VesSetRPM(rpm=msg.data*self.motor_poles)
+        rpm_msg = VescSetRPM(rpm=msg.data * self.motor_poles)
         self.send_cb(rpm_msg.get_can_msg(self.vesc_id))
         pass

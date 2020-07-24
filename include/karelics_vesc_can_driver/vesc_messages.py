@@ -4,8 +4,6 @@ from enum import IntEnum
 
 from can_msgs.msg import Frame
 
-from karelics_vesc_can_driver.vesc import Vesc
-
 
 class CanIds(IntEnum):
     """
@@ -141,7 +139,7 @@ class VescStatusMsg(CanMsg):
         self.duty_cycle = self.pop_int16() / 1000.0
         return self
 
-    def update_vesc_state(self, vesc: Vesc):
+    def update_vesc_state(self, vesc):
         vesc.erpm = self.erpm
         vesc.current = self.current
         vesc.duty_cycle = self.duty_cycle
@@ -155,7 +153,7 @@ class VescStatus2Msg(CanMsg):
         self.amp_hours = 0
         self.amp_hours_charged = 0
 
-    def update_vesc_state(self, vesc: Vesc):
+    def update_vesc_state(self, vesc):
         vesc.amp_hours = self.amp_hours
         vesc.amp_hours_charged = self.amp_hours_charged
 
@@ -174,7 +172,7 @@ class VescStatus3Msg(CanMsg):
         self.watt_hours = 0
         self.watt_hours_charged = 0
 
-    def update_vesc_state(self, vesc: Vesc):
+    def update_vesc_state(self, vesc):
         vesc.watt_hours = self.watt_hours
         vesc.watt_hours_charged = self.watt_hours_charged
 
@@ -195,7 +193,7 @@ class VescStatus4Msg(CanMsg):
         self.current_in = 0
         self.pid_pos_now = 0
 
-    def update_vesc_state(self, vesc: Vesc):
+    def update_vesc_state(self, vesc):
         vesc.temp_fet = self.temp_fet
         vesc.temp_motor = self.temp_motor
         vesc.current_in = self.current_in
@@ -218,7 +216,7 @@ class VescStatus5Msg(CanMsg):
         self.tacho_value = 0
         self.v_in = 0
 
-    def update_vesc_state(self, vesc: Vesc):
+    def update_vesc_state(self, vesc):
         vesc.tacho_value = self.tacho_value
         vesc.v_in = self.v_in
 
@@ -265,10 +263,10 @@ class VesSetBrakeCurrent(CanMsg):
         return self.out_buffer
 
 
-class VesSetRPM(CanMsg):
+class VescSetRPM(CanMsg):
 
     def __init__(self, rpm):
-        super(VesSetRPM, self).__init__(msg_id=CanIds.CAN_PACKET_SET_RPM)
+        super(VescSetRPM, self).__init__(msg_id=CanIds.CAN_PACKET_SET_RPM)
         self.rpm = rpm
 
     def get_encoded_msg(self):
