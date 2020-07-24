@@ -1,0 +1,19 @@
+actions: []
+authors: ''
+brief: ''
+bugtracker: ''
+depends:
+- python-catkin-pkg
+- socketcan_bridge
+- message_runtime
+- catkin
+- message_generation
+description: The karelics_vesc_can_driver package
+license: BSD
+maintainers: mart <mart.moerdijk@karelics.fi>
+msgs:
+- VescStatus
+package_type: package
+repo_url: ''
+srvs: []
+url: ''
