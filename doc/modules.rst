@@ -1,7 +1,9 @@
-src
-===
+The Vesc class
+==============
 
-.. toctree::
-   :maxdepth: 4
 
-   vesc_can_driver
+.. automodule:: vesc
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

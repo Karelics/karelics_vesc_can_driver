@@ -13,13 +13,14 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 # import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import sys
+#
 import os
 import catkin_pkg.package
 catkin_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 catkin_package = catkin_pkg.package.parse_package(os.path.join(catkin_dir, catkin_pkg.package.PACKAGE_MANIFEST_FILENAME))
 
+sys.path.insert(0, catkin_dir + "/include/karelics_vesc_can_driver")
 import sphinx_rtd_theme
 
 # -- Project information -----------------------------------------------------
@@ -54,6 +55,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'sphinx_rtd_theme',
+    'sphinx_ros'
 ]
 
 # Add any paths that contain templates here, relative to this directory.

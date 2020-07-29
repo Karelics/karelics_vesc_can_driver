@@ -3,11 +3,11 @@ authors: ''
 brief: ''
 bugtracker: ''
 depends:
-- python-catkin-pkg
-- socketcan_bridge
-- message_runtime
-- catkin
 - message_generation
+- python-catkin-pkg
+- message_runtime
+- socketcan_bridge
+- catkin
 description: The karelics_vesc_can_driver package
 license: BSD
 maintainers: mart <mart.moerdijk@karelics.fi>
