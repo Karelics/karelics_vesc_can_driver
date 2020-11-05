@@ -10,10 +10,11 @@ from karelics_vesc_can_driver.vesc_messages import *
 
 class Vesc:
 
-    def __init__(self, vesc_id, send_function):
+    def __init__(self, vesc_id, send_function, motor_poles, gear_ratio):
         self.vesc_id = vesc_id
 
-        self.motor_poles = 8
+        self.motor_poles = int(motor_poles)
+        self.gear_ratio = float(gear_ratio)
 
         # Status message
         self.erpm = 0
@@ -54,7 +55,7 @@ class Vesc:
         status_msg.header.stamp = rospy.Time.now()
 
         status_msg.erpm = int(self.erpm)
-        status_msg.rpm = int(self.erpm / self.motor_poles)
+        status_msg.rpm = int(self.erpm / (self.motor_poles/2) / self.gear_ratio)
         status_msg.duty_cycle = self.duty_cycle
         status_msg.current = self.current
         status_msg.amp_hours = self.amp_hours
@@ -67,6 +68,7 @@ class Vesc:
         status_msg.pid_pos_now = self.pid_pos_now
         status_msg.tacho_value = self.tacho_value
         status_msg.v_in = self.v_in
+        status_msg.rotations = self.tacho_value / self.motor_poles / 3 / self.gear_ratio
 
         self.status_pub.publish(status_msg)
 
@@ -107,6 +109,6 @@ class Vesc:
         pass
 
     def set_rpm_cb(self, msg: Float32):
-        rpm_msg = VescSetRPM(rpm=msg.data * self.motor_poles)
+        rpm_msg = VescSetRPM(rpm=msg.data * (self.motor_poles/2) * self.gear_ratio)
         self.send_cb(rpm_msg.get_can_msg(self.vesc_id))
         pass

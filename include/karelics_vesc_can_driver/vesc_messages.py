@@ -211,7 +211,6 @@ class VescStatus4Msg(CanMsg):
 class VescStatus5Msg(CanMsg):
 
     def __init__(self):
-
         super(VescStatus5Msg, self).__init__(msg_id=CanIds.CAN_PACKET_STATUS_5)
         self.tacho_value = 0
         self.v_in = 0

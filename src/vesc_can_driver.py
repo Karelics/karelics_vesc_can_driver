@@ -33,7 +33,9 @@ class VescCanDriver:
     known_vesc_ids = []
     known_vescs = []  # type: List[Vesc]
 
-    def __init__(self):
+    def __init__(self, motor_poles, gear_ratio):
+        self.motor_poles = motor_poles
+        self.gear_ratio = gear_ratio
 
         # Subscribe to can topics
         rospy.Subscriber("/received_messages", Frame, callback=self.can_cb)
@@ -73,7 +75,9 @@ class VescCanDriver:
         if vesc_id not in self.known_vesc_ids:
             self.known_vesc_ids.append(vesc_id)
             self.known_vescs.append(Vesc(vesc_id=vesc_id,
-                                         send_function=self.send_can_msg_pub.publish))
+                                         send_function=self.send_can_msg_pub.publish,
+                                         motor_poles=self.motor_poles,
+                                         gear_ratio=self.gear_ratio))
 
         # Get the index of the current vesc
         controller_idx = self.known_vesc_ids.index(vesc_id)
@@ -95,5 +99,8 @@ class VescCanDriver:
 if __name__ == '__main__':
     rospy.init_node("vesc_can_driver")
     rospy.loginfo("Starting vesc can driver")
-    vesc_can_driver = VescCanDriver()
+
+    motor_poles = rospy.get_param("~motor_poles")
+    gear_ratio = rospy.get_param("~gear_ratio")
+    vesc_can_driver = VescCanDriver(motor_poles, gear_ratio)
     rospy.spin()
