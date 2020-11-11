@@ -5,6 +5,101 @@ from enum import IntEnum
 from can_msgs.msg import Frame
 
 
+
+class ComPacketID(IntEnum):
+    COMM_FW_VERSION = 0
+    COMM_JUMP_TO_BOOTLOADER = 1
+    COMM_ERASE_NEW_APP = 2
+    COMM_WRITE_NEW_APP_DATA = 3
+    COMM_GET_VALUES = 4
+    COMM_SET_DUTY = 5
+    COMM_SET_CURRENT = 6
+    COMM_SET_CURRENT_BRAKE = 7
+    COMM_SET_RPM = 8
+    COMM_SET_POS = 9
+    COMM_SET_HANDBRAKE = 10
+    COMM_SET_DETECT = 11
+    COMM_SET_SERVO_POS = 12
+    COMM_SET_MCCONF = 13
+    COMM_GET_MCCONF = 14
+    COMM_GET_MCCONF_DEFAULT = 15
+    COMM_SET_APPCONF = 16
+    COMM_GET_APPCONF = 17
+    COMM_GET_APPCONF_DEFAULT = 18
+    COMM_SAMPLE_PRINT = 19
+    COMM_TERMINAL_CMD = 20
+    COMM_PRINT = 21
+    COMM_ROTOR_POSITION = 22
+    COMM_EXPERIMENT_SAMPLE = 23
+    COMM_DETECT_MOTOR_PARAM = 24
+    COMM_DETECT_MOTOR_R_L = 25
+    COMM_DETECT_MOTOR_FLUX_LINKAGE = 26
+    COMM_DETECT_ENCODER = 27
+    COMM_DETECT_HALL_FOC = 28
+    COMM_REBOOT = 29
+    COMM_ALIVE = 30
+    COMM_GET_DECODED_PPM = 31
+    COMM_GET_DECODED_ADC = 32
+    COMM_GET_DECODED_CHUK = 33
+    COMM_FORWARD_CAN = 34
+    COMM_SET_CHUCK_DATA = 35
+    COMM_CUSTOM_APP_DATA = 36
+    COMM_NRF_START_PAIRING = 37
+    COMM_GPD_SET_FSW = 38
+    COMM_GPD_BUFFER_NOTIFY = 39
+    COMM_GPD_BUFFER_SIZE_LEFT = 40
+    COMM_GPD_FILL_BUFFER = 41
+    COMM_GPD_OUTPUT_SAMPLE = 42
+    COMM_GPD_SET_MODE = 43
+    COMM_GPD_FILL_BUFFER_INT8 = 44
+    COMM_GPD_FILL_BUFFER_INT16 = 45
+    COMM_GPD_SET_BUFFER_INT_SCALE = 46
+    COMM_GET_VALUES_SETUP = 47
+    COMM_SET_MCCONF_TEMP = 48
+    COMM_SET_MCCONF_TEMP_SETUP = 49
+    COMM_GET_VALUES_SELECTIVE = 50
+    COMM_GET_VALUES_SETUP_SELECTIVE = 51
+    COMM_EXT_NRF_PRESENT = 52
+    COMM_EXT_NRF_ESB_SET_CH_ADDR = 53
+    COMM_EXT_NRF_ESB_SEND_DATA = 54
+    COMM_EXT_NRF_ESB_RX_DATA = 55
+    COMM_EXT_NRF_SET_ENABLED = 56
+    COMM_DETECT_MOTOR_FLUX_LINKAGE_OPENLOOP = 57
+    COMM_DETECT_APPLY_ALL_FOC = 58
+    COMM_JUMP_TO_BOOTLOADER_ALL_CAN = 59
+    COMM_ERASE_NEW_APP_ALL_CAN = 60
+    COMM_WRITE_NEW_APP_DATA_ALL_CAN = 61
+    COMM_PING_CAN = 62
+    COMM_APP_DISABLE_OUTPUT = 63
+    COMM_TERMINAL_CMD_SYNC = 64
+    COMM_GET_IMU_DATA = 65
+    COMM_BM_CONNECT = 66
+    COMM_BM_ERASE_FLASH_ALL = 67
+    COMM_BM_WRITE_FLASH = 68
+    COMM_BM_REBOOT = 69
+    COMM_BM_DISCONNECT = 70
+    COMM_BM_MAP_PINS_DEFAULT = 71
+    COMM_BM_MAP_PINS_NRF5X = 72
+    COMM_ERASE_BOOTLOADER = 73
+    COMM_ERASE_BOOTLOADER_ALL_CAN = 74
+    COMM_PLOT_INIT = 75
+    COMM_PLOT_DATA = 76
+    COMM_PLOT_ADD_GRAPH = 77
+    COMM_PLOT_SET_GRAPH = 78
+    COMM_GET_DECODED_BALANCE = 79
+    COMM_BM_MEM_READ = 80
+    COMM_WRITE_NEW_APP_DATA_LZO = 81
+    COMM_WRITE_NEW_APP_DATA_ALL_CAN_LZO = 82
+    COMM_BM_WRITE_FLASH_LZO = 83
+    COMM_SET_CURRENT_REL = 84
+    COMM_CAN_FWD_FRAME = 85
+    COMM_SET_BATTERY_CUT = 86
+    COMM_SET_BLE_NAME = 87
+    COMM_SET_BLE_PIN = 88
+    COMM_SET_CAN_MODE = 89
+    COMM_GET_IMU_CALIBRATIO = 90
+
+
 class CanIds(IntEnum):
     """
     Can id's from: 
@@ -71,7 +166,17 @@ class CanMsg(metaclass=ABCMeta):
         data = struct.unpack(">h", self.in_buffer[self.pointer:self.pointer + 2])[0]
         self.pointer += 2
         return data
-    
+
+    def pop_uint16(self):
+
+        data = struct.unpack(">H", self.in_buffer[self.pointer:self.pointer + 2])[0]
+        self.pointer += 2
+        return data
+
+    def pop_float32(self):
+        data = struct.unpack(">f", self.in_buffer[self.pointer:self.pointer + 4])[0]
+        self.pointer += 4
+        return data
     """
     Encoding
     """    
@@ -81,6 +186,22 @@ class CanMsg(metaclass=ABCMeta):
 
     def encode_uint32(self, value):
         for b in struct.pack(">I", value):
+            self.out_buffer.append(b)
+
+    def encode_int16(self, value):
+        for b in struct.pack(">h", value):
+            self.out_buffer.append(b)
+
+    def encode_uint16(self, value):
+        for b in struct.pack(">H", value):
+            self.out_buffer.append(b)
+
+    def encode_int8(self, value):
+        for b in struct.pack(">b", value):
+            self.out_buffer.append(b)
+
+    def encode_uint8(self, value):
+        for b in struct.pack(">B", value):
             self.out_buffer.append(b)
 
     def encode_float32(self, value):
@@ -123,6 +244,15 @@ class CanMsg(metaclass=ABCMeta):
     def get_encoded_msg(self):
         pass
 
+    def update_vesc_state(self, vesc):
+        pass
+
+
+class ComMsg(CanMsg):
+    def __init__(self, msg_id:ComPacketID):
+        super(ComMsg, self).__init__(msg_id)
+
+# Incomming messages
 
 class VescStatusMsg(CanMsg):
 
@@ -227,10 +357,95 @@ class VescStatus5Msg(CanMsg):
         return self
 
 
-class VesSetDuty(CanMsg):
+class VescIMUData(ComMsg):
+
+    def __init__(self):
+        super(VescIMUData, self).__init__(msg_id=ComPacketID.COMM_GET_IMU_DATA)
+        self.roll = 0
+        self.pitch = 0
+        self.yaw = 0
+        self.accX = 0
+        self.accY = 0
+        self.accZ = 0
+        self.gyroX = 0
+        self.gyroY = 0
+        self.gyroZ = 0
+        self.magX = 0
+        self.magY = 0
+        self.magZ = 0
+        self.q0 = 0
+        self.q1 = 0
+        self.q2 = 0
+        self.q3 = 0
+
+    def process_msg(self, data):
+        self.set_data(data)
+        mask = self.pop_uint16()
+        # Only unpack if the data is set
+        if mask & (1 << 0):
+            self.roll = self.pop_float32()
+        if mask & (1 << 1):
+            self.pitch = self.pop_float32()
+        if mask & (1 << 2):
+            self.yaw = self.pop_float32()
+        if mask & (1 << 3):
+            self.accX = self.pop_float32()
+        if mask & (1 << 4):
+            self.accY = self.pop_float32()
+        if mask & (1 << 5):
+            self.accZ = self.pop_float32()
+        if mask & (1 << 6):
+            self.gyroX = self.pop_float32()
+        if mask & (1 << 7):
+            self.gyroY = self.pop_float32()
+        if mask & (1 << 8):
+            self.gyroZ = self.pop_float32()
+        if mask & (1 << 9):
+            self.magX = self.pop_float32()
+        if mask & (1 << 10):
+            self.magY = self.pop_float32()
+        if mask & (1 << 11):
+            self.magZ = self.pop_float32()
+        if mask & (1 << 12):
+            self.q0 = self.pop_float32()
+        if mask & (1 << 13):
+            self.q1 = self.pop_float32()
+        if mask & (1 << 14):
+            self.q2 = self.pop_float32()
+        if mask & (1 << 15):
+            self.q3 = self.pop_float32()
+
+        return self
+
+    def update_vesc_state(self, vesc):
+
+        # This is a multi package message so tell the vesc that it is not waiting
+        vesc.data_recieved()
+        # Update state
+        vesc.roll = self.roll
+        vesc.pitch = self.pitch
+        vesc.yaw = self.yaw
+        vesc.accX = self.accX
+        vesc.accY = self.accY
+        vesc.accZ = self.accZ
+        vesc.gyroX = self.gyroX
+        vesc.gyroY = self.gyroY
+        vesc.gyroZ = self.gyroZ
+        vesc.magX = self.magX
+        vesc.magY = self.magY
+        vesc.magZ = self.magZ
+        vesc.q0 = self.q0
+        vesc.q1 = self.q1
+        vesc.q2 = self.q2
+        vesc.q3 = self.q3
+
+
+# Out going messages
+
+class VescSetDuty(CanMsg):
 
     def __init__(self, dutycycle=0):
-        super(VesSetDuty, self).__init__(msg_id=CanIds.CAN_PACKET_SET_DUTY)
+        super(VescSetDuty, self).__init__(msg_id=CanIds.CAN_PACKET_SET_DUTY)
         self.duty_cycle = dutycycle
 
     def get_encoded_msg(self):
@@ -239,10 +454,10 @@ class VesSetDuty(CanMsg):
         return self.out_buffer
 
 
-class VesSetCurrent(CanMsg):
+class VescSetCurrent(CanMsg):
 
     def __init__(self, current=0):
-        super(VesSetCurrent, self).__init__(msg_id=CanIds.CAN_PACKET_SET_CURRENT)
+        super(VescSetCurrent, self).__init__(msg_id=CanIds.CAN_PACKET_SET_CURRENT)
         self.current = current
 
     def get_encoded_msg(self):
@@ -251,10 +466,10 @@ class VesSetCurrent(CanMsg):
         return self.out_buffer
 
 
-class VesSetBrakeCurrent(CanMsg):
+class VescSetBrakeCurrent(CanMsg):
 
     def __init__(self, current=0):
-        super(VesSetBrakeCurrent, self).__init__(msg_id=CanIds.CAN_PACKET_SET_CURRENT_BRAKE)
+        super(VescSetBrakeCurrent, self).__init__(msg_id=CanIds.CAN_PACKET_SET_CURRENT_BRAKE)
         self.current = current
 
     def get_encoded_msg(self):
@@ -275,10 +490,10 @@ class VescSetRPM(CanMsg):
         return self.out_buffer
 
 
-class VesSetPos(CanMsg):
+class VescSetPos(CanMsg):
 
     def __init__(self, pos=0):
-        super(VesSetPos, self).__init__(msg_id=CanIds.CAN_PACKET_SET_POS)
+        super(VescSetPos, self).__init__(msg_id=CanIds.CAN_PACKET_SET_POS)
         self.pos = pos
 
     def get_encoded_msg(self):
@@ -287,17 +502,31 @@ class VesSetPos(CanMsg):
         return self.out_buffer
 
 
-class VesSetCurrentRel(CanMsg):
+class VescSetCurrentRel(CanMsg):
     """
     Set current relative to the minimum and maximum current limits.
     range [-1.0 1.0]
     """
 
     def __init__(self, current=0):
-        super(VesSetCurrentRel, self).__init__(msg_id=CanIds.CAN_PACKET_SET_CURRENT_REL)
+        super(VescSetCurrentRel, self).__init__(msg_id=CanIds.CAN_PACKET_SET_CURRENT_REL)
         self.current = current
 
     def get_encoded_msg(self):
         self.start_msg()
         self.encode_float32(int(self.current))
+        return self.out_buffer
+
+
+class VescGetImuData(CanMsg):
+
+    def __init__(self):
+        super(VescGetImuData, self).__init__(msg_id=CanIds.CAN_PACKET_PROCESS_SHORT_BUFFER)
+
+    def get_encoded_msg(self):
+        self.start_msg()
+        self.encode_uint8(0xFE)  # VescTool ID
+        self.encode_uint8(0x0)    # Not Used
+        self.encode_uint8(0x41)    # Not Used
+        self.encode_uint16(0xFFFF)
         return self.out_buffer
