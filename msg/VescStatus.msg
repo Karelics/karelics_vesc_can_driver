@@ -18,3 +18,5 @@ float32 pid_pos_now
 # Status message 5
 float32 tacho_value
 float32 v_in
+# Custom messages
+float32 rotations
