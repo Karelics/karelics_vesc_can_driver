@@ -163,6 +163,7 @@ class VescCanDriver:
             rospy.loginfo(str(e))
 
         # Publish the current status of the vescs in to ros world
+        # TODO should we process tick only for the current_vesc?
         for vesc in self.known_vescs:
             vesc.tick()
 
