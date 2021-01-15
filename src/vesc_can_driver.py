@@ -167,6 +167,15 @@ class VescCanDriver:
         for vesc in self.known_vescs:
             vesc.tick()
 
+        self.monitor_total_current()
+
+    def monitor_total_current(self):
+        total_current = 0
+        for vesc in self.known_vescs:
+            total_current += vesc.current
+        #print(total_current)
+
+
 
 if __name__ == '__main__':
     rospy.init_node("vesc_can_driver")
