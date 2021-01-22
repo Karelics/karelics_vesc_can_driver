@@ -10,13 +10,15 @@ from karelics_vesc_can_driver.vesc_messages import *
 
 class Vesc:
 
-    def __init__(self, vesc_id, send_function, lock_function, release_function, motor_poles, gear_ratio):
+    def __init__(self, vesc_id, send_function, lock_function, release_function, motor_poles, gear_ratio,
+                 current_monitor):
         self._get_imu_data = False
         self._request_send = False
         self.vesc_id = vesc_id
 
         self.motor_poles = int(motor_poles)
         self.gear_ratio = float(gear_ratio)
+        self.current_monitor = current_monitor
 
         # Status message
         self.erpm = 0
@@ -180,9 +182,10 @@ class Vesc:
         return string
 
     def set_current_cb(self, msg: Float32):
-        current_msg = VescSetCurrent(current=msg.data)
-        self.send_cb(current_msg.get_can_msg(self.vesc_id))
-        pass
+        if self.current_monitor.is_safe():
+            current_msg = VescSetCurrent(current=msg.data)
+            self.send_cb(current_msg.get_can_msg(self.vesc_id))
+            pass
 
     def set_brake_cb(self, msg: Float32):
         brake_current_msg = VescSetBrakeCurrent(current=msg.data)
@@ -190,19 +193,23 @@ class Vesc:
         pass
 
     def set_duty_cycle_cb(self, msg: Float32):
-        dutycyle_msg = VescSetDuty(dutycycle=msg.data)
-        self.send_cb(dutycyle_msg.get_can_msg(self.vesc_id))
+        if self.current_monitor.is_safe():
+            dutycyle_msg = VescSetDuty(dutycycle=msg.data)
+            self.send_cb(dutycyle_msg.get_can_msg(self.vesc_id))
 
     def set_position_cb(self, msg: Float32):
-        pos_msg = VescSetPos(pos=msg.data)
-        self.send_cb(pos_msg.get_can_msg(self.vesc_id))
+        if self.current_monitor.is_safe():
+            pos_msg = VescSetPos(pos=msg.data)
+            self.send_cb(pos_msg.get_can_msg(self.vesc_id))
 
     def set_erpm_cb(self, msg: Float32):
-        rpm_msg = VescSetRPM(rpm=msg.data)
-        self.send_cb(rpm_msg.get_can_msg(self.vesc_id))
+        if self.current_monitor.is_safe():
+            rpm_msg = VescSetRPM(rpm=msg.data)
+            self.send_cb(rpm_msg.get_can_msg(self.vesc_id))
         pass
 
     def set_rpm_cb(self, msg: Float32):
-        rpm_msg = VescSetRPM(rpm=msg.data * (self.motor_poles/2) * self.gear_ratio)
-        self.send_cb(rpm_msg.get_can_msg(self.vesc_id))
+        if self.current_monitor.is_safe():
+            rpm_msg = VescSetRPM(rpm=msg.data * (self.motor_poles/2) * self.gear_ratio)
+            self.send_cb(rpm_msg.get_can_msg(self.vesc_id))
         pass
