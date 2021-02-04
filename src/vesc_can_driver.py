@@ -175,7 +175,7 @@ class VescCanDriver:
 
 
 if __name__ == '__main__':
-    rospy.init_node("vesc_can_driver", log_level=rospy.DEBUG)
+    rospy.init_node("vesc_can_driver")
     rospy.loginfo("Starting vesc can driver")
 
     motor_poles = rospy.get_param("~motor_poles")
