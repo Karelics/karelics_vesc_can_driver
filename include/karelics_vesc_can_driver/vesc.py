@@ -182,10 +182,9 @@ class Vesc:
         return string
 
     def set_current_cb(self, msg: Float32):
-        if self.current_monitor.is_safe():
-            current_msg = VescSetCurrent(current=msg.data)
-            self.send_cb(current_msg.get_can_msg(self.vesc_id))
-            pass
+        current_msg = VescSetCurrent(current=msg.data)
+        self.send_cb(current_msg.get_can_msg(self.vesc_id))
+        pass
 
     def set_brake_cb(self, msg: Float32):
         brake_current_msg = VescSetBrakeCurrent(current=msg.data)
@@ -193,23 +192,23 @@ class Vesc:
         pass
 
     def set_duty_cycle_cb(self, msg: Float32):
-        if self.current_monitor.is_safe():
-            dutycyle_msg = VescSetDuty(dutycycle=msg.data)
-            self.send_cb(dutycyle_msg.get_can_msg(self.vesc_id))
+        dutycyle_msg = VescSetDuty(dutycycle=msg.data)
+        self.send_cb(dutycyle_msg.get_can_msg(self.vesc_id))
 
     def set_position_cb(self, msg: Float32):
-        if self.current_monitor.is_safe():
-            pos_msg = VescSetPos(pos=msg.data)
-            self.send_cb(pos_msg.get_can_msg(self.vesc_id))
+        pos_msg = VescSetPos(pos=msg.data)
+        self.send_cb(pos_msg.get_can_msg(self.vesc_id))
 
     def set_erpm_cb(self, msg: Float32):
-        if self.current_monitor.is_safe():
-            rpm_msg = VescSetRPM(rpm=msg.data)
-            self.send_cb(rpm_msg.get_can_msg(self.vesc_id))
+        if not self.current_monitor.is_safe():
+            msg.data = 0
+        rpm_msg = VescSetRPM(rpm=msg.data)
+        self.send_cb(rpm_msg.get_can_msg(self.vesc_id))
         pass
 
     def set_rpm_cb(self, msg: Float32):
-        if self.current_monitor.is_safe():
-            rpm_msg = VescSetRPM(rpm=msg.data * (self.motor_poles/2) * self.gear_ratio)
-            self.send_cb(rpm_msg.get_can_msg(self.vesc_id))
+        if not self.current_monitor.is_safe():
+            msg.data = 0
+        rpm_msg = VescSetRPM(rpm=msg.data * (self.motor_poles/2) * self.gear_ratio)
+        self.send_cb(rpm_msg.get_can_msg(self.vesc_id))
         pass

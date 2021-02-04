@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
 
 from typing import List, Union
-from collections import deque
-from threading import Thread
-import numpy as np
-
 import rospy
 
 from can_msgs.msg import Frame
 from std_srvs.srv import Trigger, TriggerRequest
-from std_msgs.msg import Float32
 
 from karelics_vesc_can_driver.vesc_messages import *
 from karelics_vesc_can_driver.vesc import *
+from karelics_vesc_can_driver.max_current_monitor import MonitorMaxCurrent
 
 
 class CanMessageHandler:
@@ -109,7 +105,7 @@ class VescCanDriver:
         self.can_msg_handler.register_message(self.vesc_imu_msg)
 
         # Set Current monitor to ensure battery health
-        self.current_monitor = MonitorOvercurrent(cont_current_lim)
+        self.current_monitor = MonitorMaxCurrent(cont_current_lim)
 
     def aquire_vesc_tool_id_lock(self, vesc_id):
         if self._active_vesc_id and self._active_vesc_id != vesc_id:
@@ -171,135 +167,11 @@ class VescCanDriver:
             rospy.loginfo(str(e))
 
         # Publish the current status of the vescs in to ros world
-        # TODO should we process tick only for the current_vesc?
+        # TODO Why do we do this for all the vescs? Should we process tick only for the current_vesc?
         for vesc in self.known_vescs:
             vesc.tick()
 
         self.current_monitor.tick(self.known_vescs)
-
-
-class TimeDeque:
-    """ Implements a deque, but instead of giving maxlen to it, you can give it max_seconds.
-        Only the data from the past max_seconds is stored. """
-
-    def __init__(self, max_seconds=10):
-        self.time_deque = deque()
-        self.max_seconds = max_seconds
-        self.pub = rospy.Publisher("/status/vescs/median_current", Float32, queue_size=1)
-
-    def _remove_old_data(self):
-        now = rospy.get_time()
-        while self.time_deque:
-            t = self.time_deque[0][0]
-            if now - t > self.max_seconds:
-                self.time_deque.popleft()
-            else:
-                break
-
-    def append(self, value):
-        self._remove_old_data()
-        self.time_deque.append([rospy.get_time(), value])
-
-    def get_median(self):
-        self._remove_old_data()
-        total_currents = []
-        for _, v in self.time_deque:
-            total_currents.append(v)
-        med = self.median(total_currents) #np.median(self.time_deque, axis=0)[1]
-        msg_data = Float32()
-        msg_data.data = med
-        self.pub.publish(med)
-        return med
-
-    @staticmethod
-    def median(lst):
-        n = len(lst)
-        s = sorted(lst)
-        return (sum(s[n // 2 - 1:n // 2 + 1]) / 2.0, s[n // 2])[n % 2] if n else None
-
-# TODO MonitorBatteryMaxDischarge
-class MonitorOvercurrent:
-    def __init__(self, cont_current_lim):
-        self.cont_current_lim = cont_current_lim
-        self.total_current_pub = rospy.Publisher("vescs/total_current", Float32, queue_size=1)
-        self.time_deque = TimeDeque()
-        #self.prev_oc_time = None
-        #self.prev_total_curr = 0
-
-        self.allowed_overcurrent_time = 2  # Time in seconds for how long the overcurrent can be applied
-        self.time_deque = TimeDeque(max_seconds=self.allowed_overcurrent_time*2)
-        #self.allowed_peaks = 2 * self.allowed_overcurrent_time  # How many peaks do we allow withing allowed_overcurrent_time
-        self.overcurrent_cooldown = 5  # in seconds
-
-        self.fatal_current = False
-
-    def _handle_safety_limit(self, total_current):
-        self.time_deque.append(total_current)
-        median = self.time_deque.get_median()  # Checking if we motors have drawn maximum current over 2 second total within 4 seconds time window
-        if median >= self.cont_current_lim and not self.fatal_current:
-            self._set_overcurrent()
-
-
-    # def _handle_safety_limit(self, total_current):
-    #     now = rospy.get_time()
-    #     num_peaks = self.get_peaks_from_time_window()
-    #
-    #     # First time exceeding the overcurrent limit
-    #     if total_current >= self.cont_current_lim > self.prev_total_curr:
-    #         self.peaks.append(now)
-    #
-    #     # Exceeded the overcurrent limit on last tick as well
-    #     elif total_current >= self.cont_current_lim:
-    #         peak_length = now - self.peaks[-1]
-    #         if peak_length > self.allowed_overcurrent_time:
-    #             rospy.logdebug("Motor current has been over {} for {} seconds".format(self.cont_current_lim,
-    #                                                                                   self.allowed_overcurrent_time))
-    #             self._set_overcurrent()
-    #
-    #     elif num_peaks > self.allowed_peaks:
-    #         self._set_overcurrent()
-    #         rospy.logdebug("Motor current has peaked over {}A for {} times within {} seconds"
-    #                        "".format(self.cont_current_lim, num_peaks, self.allowed_overcurrent_time))
-    #
-    #     # TODO Check max peaks
-    #     self.prev_total_curr = total_current
-
-    def _set_overcurrent(self):
-        rospy.logerr("Motors are applying too high total current. Cutting off.")
-        self.fatal_current = True
-        thread = Thread(target=self._set_motor_cooldown, args=())
-        thread.daemon = True
-        thread.start()
-
-    def _set_motor_cooldown(self):
-        rospy.logerr("Starting {} seconds cooldown.".format(self.overcurrent_cooldown))
-        rospy.sleep(self.overcurrent_cooldown)
-        rospy.loginfo("Motors are now ready for operation.")
-        self.fatal_current = False
-
-    # def get_peaks_from_time_window(self):
-    #     num_peaks = 0
-    #     now = rospy.get_time()
-    #     for peak_time in reversed(self.peaks):
-    #         if now - peak_time < self.allowed_overcurrent_time:
-    #             num_peaks += 1
-    #         else:
-    #             break
-    #     return num_peaks
-
-    def tick(self, vescs):
-        total_current = 0
-        for vesc in vescs:
-            total_current += vesc.current
-        current_msg = Float32()
-        current_msg.data = total_current
-        self.total_current_pub.publish(current_msg)
-        self._handle_safety_limit(total_current)
-
-
-    def is_safe(self):
-        """ Returns True if it's not safe to rotate motors without exceeding battery current limits """
-        return not self.fatal_current
 
 
 if __name__ == '__main__':
