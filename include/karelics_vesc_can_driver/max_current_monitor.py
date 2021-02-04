@@ -20,7 +20,7 @@ class MonitorMaxCurrent:
         cont_current_lim : float
             maximum continuous discharge current of the battery in amps (A)
         max_overcurrent_time: float
-            maximum time we can draw more than the maximum current (in seconds).
+            maximum time (in seconds) we can draw more than the maximum current.
         """
         self.cont_current_lim = cont_current_lim
         self.max_draw_time = max_draw_time  # Time in seconds for how long the overcurrent can be applied
