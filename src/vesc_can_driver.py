@@ -5,6 +5,7 @@ import rospy
 
 from can_msgs.msg import Frame
 from std_srvs.srv import Trigger, TriggerRequest
+from sensor_msgs.msg import BatteryState
 
 from karelics_vesc_can_driver.vesc_messages import *
 from karelics_vesc_can_driver.vesc import *
@@ -83,6 +84,7 @@ class VescCanDriver:
 
         # Make publisher to send can messages
         self.send_can_msg_pub = rospy.Publisher("sent_messages", Frame, queue_size=1)
+        self.battery_pub = rospy.Publisher("battery", BatteryState, queue_size=1)
 
         # Initialize CAN message handler and add message types
         self.can_msg_handler = CanMessageHandler()
@@ -168,10 +170,23 @@ class VescCanDriver:
 
         # Publish the current status of the vescs in to ros world
         # TODO Why do we do this for all the vescs? Should we process tick only for the current_vesc?
+        vesc = None
         for vesc in self.known_vescs:
             vesc.tick()
 
+        if vesc is not None:
+            self.publish_battery_state(vesc.v_in)
+
         self.current_monitor.tick(self.known_vescs)
+
+    def publish_battery_state(self, voltage):
+        min_volt = 36
+        max_volt = 54.4
+        percentage = (voltage - min_volt) / (max_volt - min_volt)
+        battery_state = BatteryState()
+        battery_state.voltage = voltage
+        battery_state.percentage = percentage
+        self.battery_pub.publish(battery_state)
 
 
 if __name__ == '__main__':
