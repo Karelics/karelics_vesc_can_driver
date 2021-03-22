@@ -1,4 +1,4 @@
-import struct
+import structdebug
 from abc import ABCMeta
 from enum import IntEnum
 
