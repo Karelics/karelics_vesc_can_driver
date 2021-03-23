@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from typing import List, Union
-
 import rospy
 
 from can_msgs.msg import Frame
@@ -9,6 +8,7 @@ from std_srvs.srv import Trigger, TriggerRequest
 
 from karelics_vesc_can_driver.vesc_messages import *
 from karelics_vesc_can_driver.vesc import *
+from karelics_vesc_can_driver.max_current_monitor import MonitorMaxCurrent
 
 
 class CanMessageHandler:
@@ -74,7 +74,7 @@ class VescCanDriver:
     known_vesc_ids = []
     known_vescs = []  # type: List[Vesc]
 
-    def __init__(self, motor_poles, gear_ratio):
+    def __init__(self, motor_poles, gear_ratio, cont_current_lim):
         self.motor_poles = motor_poles
         self.gear_ratio = gear_ratio
 
@@ -103,6 +103,9 @@ class VescCanDriver:
         self.can_msg_handler.register_message(self.vesc_status4_msg)
         self.can_msg_handler.register_message(self.vesc_status5_msg)
         self.can_msg_handler.register_message(self.vesc_imu_msg)
+
+        # Set Current monitor to ensure battery health
+        self.current_monitor = MonitorMaxCurrent(cont_current_lim)
 
     def aquire_vesc_tool_id_lock(self, vesc_id):
         if self._active_vesc_id and self._active_vesc_id != vesc_id:
@@ -142,7 +145,8 @@ class VescCanDriver:
                                              lock_function=self.aquire_vesc_tool_id_lock,
                                              release_function=self.release_vesc_tool_id_lock,
                                              motor_poles=self.motor_poles,
-                                             gear_ratio=self.gear_ratio))
+                                             gear_ratio=self.gear_ratio,
+                                             current_monitor=self.current_monitor))
         else:
             if self._active_vesc_id:
                 vesc_id = self._active_vesc_id
@@ -163,8 +167,11 @@ class VescCanDriver:
             rospy.loginfo(str(e))
 
         # Publish the current status of the vescs in to ros world
+        # TODO Why do we do this for all the vescs? Should we process tick only for the current_vesc?
         for vesc in self.known_vescs:
             vesc.tick()
+
+        self.current_monitor.tick(self.known_vescs)
 
 
 if __name__ == '__main__':
@@ -173,5 +180,6 @@ if __name__ == '__main__':
 
     motor_poles = rospy.get_param("~motor_poles")
     gear_ratio = rospy.get_param("~gear_ratio")
-    vesc_can_driver = VescCanDriver(motor_poles, gear_ratio)
+    cont_current_lim = rospy.get_param("~continuous_current_limit")
+    vesc_can_driver = VescCanDriver(motor_poles, gear_ratio, cont_current_lim)
     rospy.spin()
