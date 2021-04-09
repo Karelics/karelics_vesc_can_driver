@@ -477,6 +477,18 @@ class VescSetBrakeCurrent(CanMsg):
         return self.out_buffer
 
 
+class VescSetHandbrakeCurrent(CanMsg):
+
+    def __init__(self, current=0):
+        super(VescSetHandbrakeCurrent, self).__init__(msg_id=CanIds.CAN_PACKET_SET_CURRENT_HANDBRAKE)
+        self.current = current
+
+    def get_encoded_msg(self):
+        self.start_msg()
+        self.encode_int32(int(self.current*1000))
+        return self.out_buffer
+
+
 class VescSetRPM(CanMsg):
 
     def __init__(self, rpm):
@@ -526,6 +538,6 @@ class VescGetImuData(CanMsg):
         self.start_msg()
         self.encode_uint8(0xFE)  # VescTool ID
         self.encode_uint8(0x0)    # Not Used
-        self.encode_uint8(0x41)    # Not Used
+        self.encode_uint8(ComPacketID.COMM_GET_IMU_DATA)
         self.encode_uint16(0xFFFF)
         return self.out_buffer
