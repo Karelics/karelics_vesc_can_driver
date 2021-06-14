@@ -1,0 +1,82 @@
+[0.009s] Invoking command in '/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver': CMAKE_PREFIX_PATH=/opt/ros/foxy /usr/bin/cmake --build /home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver -- -j12 -l12
+[0.025s] -- Found ament_cmake: 0.9.8 (/opt/ros/foxy/share/ament_cmake/cmake)
+[0.041s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[0.210s] -- Found rosidl_default_generators: 1.0.1 (/opt/ros/foxy/share/rosidl_default_generators/cmake)
+[0.211s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.214s] -- Found rosidl_adapter: 1.2.1 (/opt/ros/foxy/share/rosidl_adapter/cmake)
+[0.306s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.337s] -- Found PythonInterp: /usr/bin/python3 (found version "3.8.5") 
+[0.423s] -- Found ament_cmake_ros: 0.9.1 (/opt/ros/foxy/share/ament_cmake_ros/cmake)
+[0.492s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.497s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.514s] -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.5", minimum required is "3.5") 
+[0.515s] -- Found python_cmake_module: 0.8.1 (/opt/ros/foxy/share/python_cmake_module/cmake)
+[0.536s] -- Found PythonLibs: /usr/lib/x86_64-linux-gnu/libpython3.8.so (found suitable version "3.8.5", minimum required is "3.5") 
+[0.536s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[0.536s] -- Using PYTHON_INCLUDE_DIRS: /usr/include/python3.8
+[0.536s] -- Using PYTHON_LIBRARIES: /usr/lib/x86_64-linux-gnu/libpython3.8.so
+[0.551s] -- Found PythonExtra: .so  
+[0.579s] -- Found ament_lint_auto: 0.9.6 (/opt/ros/foxy/share/ament_lint_auto/cmake)
+[0.592s] -- Added test 'copyright' to check source files copyright and LICENSE
+[0.599s] -- Added test 'cppcheck' to perform static code analysis on C / C++ code
+[0.600s] -- Configured cppcheck include dirs: $<BUILD_INTERFACE:/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_generator_c>;/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_generator_c;/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_generator_cpp;/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_typesupport_fastrtps_c;/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_typesupport_fastrtps_cpp;$<BUILD_INTERFACE:/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_typesupport_introspection_c>;$<BUILD_INTERFACE:/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_typesupport_c>;$<BUILD_INTERFACE:/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_generator_cpp>;/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_generator_py
+[0.600s] -- Configured cppcheck exclude dirs and/or files: 
+[0.605s] -- Added test 'cpplint' to check C / C++ code against the Google style
+[0.606s] -- Configured cpplint exclude dirs and/or files: 
+[0.606s] -- Added test 'flake8' to check Python code syntax and style conventions
+[0.608s] -- Added test 'lint_cmake' to check CMake code style
+[0.609s] -- Added test 'pep257' to check Python code against some of the style conventions in PEP 257
+[0.615s] -- Added test 'uncrustify' to check C / C++ code style
+[0.615s] -- Configured uncrustify additional arguments: 
+[0.616s] -- Added test 'xmllint' to check XML markup files
+[0.619s] -- Configuring done
+[0.641s] -- Generating done
+[0.643s] -- Build files have been written to: /home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver
+[0.659s] [  3%] [34m[1mGenerating C code for ROS interfaces[0m
+[0.659s] [35m[1mScanning dependencies of target karelics_vesc_can_driver__cpp[0m
+[0.665s] [  6%] [34m[1mGenerating C++ code for ROS interfaces[0m
+[0.872s] [  6%] Built target karelics_vesc_can_driver__cpp
+[0.872s] [35m[1mScanning dependencies of target karelics_vesc_can_driver__rosidl_generator_c[0m
+[0.879s] [ 16%] [34m[1mGenerating C++ introspection for ROS interfaces[0m
+[0.879s] [ 16%] [34m[1mGenerating C++ type support for eProsima Fast-RTPS[0m
+[0.879s] [ 16%] [34m[1mGenerating C++ type support dispatch for ROS interfaces[0m
+[0.879s] [ 19%] [32mBuilding C object CMakeFiles/karelics_vesc_can_driver__rosidl_generator_c.dir/rosidl_generator_c/karelics_vesc_can_driver/msg/detail/vesc_status__functions.c.o[0m
+[0.927s] In file included from [01m[K/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_generator_c/karelics_vesc_can_driver/msg/detail/vesc_status__functions.h:19[m[K,
+[0.927s]                  from [01m[K/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_generator_c/karelics_vesc_can_driver/msg/detail/vesc_status__functions.c:4[m[K:
+[0.927s] [01m[K/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_generator_c/karelics_vesc_can_driver/msg/detail/vesc_status__struct.h:22:10:[m[K [01;31m[Kfatal error: [m[Kkarelics_vesc_can_driver/msg/detail/header__struct.h: No such file or directory
+[0.927s]    22 | #include [01;31m[K"karelics_vesc_can_driver/msg/detail/header__struct.h"[m[K
+[0.927s]       |          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[0.927s] compilation terminated.
+[0.928s] make[2]: *** [CMakeFiles/karelics_vesc_can_driver__rosidl_generator_c.dir/build.make:92: CMakeFiles/karelics_vesc_can_driver__rosidl_generator_c.dir/rosidl_generator_c/karelics_vesc_can_driver/msg/detail/vesc_status__functions.c.o] Error 1
+[0.928s] make[1]: *** [CMakeFiles/Makefile2:325: CMakeFiles/karelics_vesc_can_driver__rosidl_generator_c.dir/all] Error 2
+[0.928s] make[1]: *** Waiting for unfinished jobs....
+[1.070s] [35m[1mScanning dependencies of target karelics_vesc_can_driver__rosidl_typesupport_cpp[0m
+[1.080s] [ 22%] [32mBuilding CXX object CMakeFiles/karelics_vesc_can_driver__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/karelics_vesc_can_driver/msg/vesc_status__type_support.cpp.o[0m
+[1.082s] [35m[1mScanning dependencies of target karelics_vesc_can_driver__rosidl_typesupport_introspection_cpp[0m
+[1.091s] [ 25%] [32mBuilding CXX object CMakeFiles/karelics_vesc_can_driver__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/karelics_vesc_can_driver/msg/detail/vesc_status__type_support.cpp.o[0m
+[1.092s] [35m[1mScanning dependencies of target karelics_vesc_can_driver__rosidl_typesupport_fastrtps_cpp[0m
+[1.104s] [ 29%] [32mBuilding CXX object CMakeFiles/karelics_vesc_can_driver__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/karelics_vesc_can_driver/msg/detail/dds_fastrtps/vesc_status__type_support.cpp.o[0m
+[1.176s] In file included from [01m[K/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_typesupport_cpp/karelics_vesc_can_driver/msg/vesc_status__type_support.cpp:7[m[K:
+[1.176s] [01m[K/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_generator_cpp/karelics_vesc_can_driver/msg/detail/vesc_status__struct.hpp:19:10:[m[K [01;31m[Kfatal error: [m[Kkarelics_vesc_can_driver/msg/detail/header__struct.hpp: No such file or directory
+[1.176s]    19 | #include [01;31m[K"karelics_vesc_can_driver/msg/detail/header__struct.hpp"[m[K
+[1.177s]       |          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[1.177s] compilation terminated.
+[1.177s] make[2]: *** [CMakeFiles/karelics_vesc_can_driver__rosidl_typesupport_cpp.dir/build.make:73: CMakeFiles/karelics_vesc_can_driver__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/karelics_vesc_can_driver/msg/vesc_status__type_support.cpp.o] Error 1
+[1.177s] make[1]: *** [CMakeFiles/Makefile2:408: CMakeFiles/karelics_vesc_can_driver__rosidl_typesupport_cpp.dir/all] Error 2
+[1.178s] In file included from [01m[K/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_typesupport_fastrtps_cpp/karelics_vesc_can_driver/msg/detail/vesc_status__rosidl_typesupport_fastrtps_cpp.hpp:11[m[K,
+[1.178s]                  from [01m[K/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_typesupport_fastrtps_cpp/karelics_vesc_can_driver/msg/detail/dds_fastrtps/vesc_status__type_support.cpp:4[m[K:
+[1.178s] [01m[K/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_generator_cpp/karelics_vesc_can_driver/msg/detail/vesc_status__struct.hpp:19:10:[m[K [01;31m[Kfatal error: [m[Kkarelics_vesc_can_driver/msg/detail/header__struct.hpp: No such file or directory
+[1.178s]    19 | #include [01;31m[K"karelics_vesc_can_driver/msg/detail/header__struct.hpp"[m[K
+[1.179s]       |          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[1.179s] compilation terminated.
+[1.179s] In file included from [01m[K/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_typesupport_introspection_cpp/karelics_vesc_can_driver/msg/detail/vesc_status__type_support.cpp:12[m[K:
+[1.179s] [01m[K/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_generator_cpp/karelics_vesc_can_driver/msg/detail/vesc_status__struct.hpp:19:10:[m[K [01;31m[Kfatal error: [m[Kkarelics_vesc_can_driver/msg/detail/header__struct.hpp: No such file or directory
+[1.179s]    19 | #include [01;31m[K"karelics_vesc_can_driver/msg/detail/header__struct.hpp"[m[K
+[1.179s]       |          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[1.179s] compilation terminated.
+[1.179s] make[2]: *** [CMakeFiles/karelics_vesc_can_driver__rosidl_typesupport_fastrtps_cpp.dir/build.make:78: CMakeFiles/karelics_vesc_can_driver__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/karelics_vesc_can_driver/msg/detail/dds_fastrtps/vesc_status__type_support.cpp.o] Error 1
+[1.179s] make[1]: *** [CMakeFiles/Makefile2:352: CMakeFiles/karelics_vesc_can_driver__rosidl_typesupport_fastrtps_cpp.dir/all] Error 2
+[1.180s] make[2]: *** [CMakeFiles/karelics_vesc_can_driver__rosidl_typesupport_introspection_cpp.dir/build.make:78: CMakeFiles/karelics_vesc_can_driver__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/karelics_vesc_can_driver/msg/detail/vesc_status__type_support.cpp.o] Error 1
+[1.180s] make[1]: *** [CMakeFiles/Makefile2:238: CMakeFiles/karelics_vesc_can_driver__rosidl_typesupport_introspection_cpp.dir/all] Error 2
+[1.180s] make: *** [Makefile:141: all] Error 2
+[1.181s] Invoked command in '/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver' returned '2': CMAKE_PREFIX_PATH=/opt/ros/foxy /usr/bin/cmake --build /home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver -- -j12 -l12

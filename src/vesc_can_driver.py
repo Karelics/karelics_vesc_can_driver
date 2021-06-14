@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
-
 from typing import List, Union
-import rospy
+
+import rclpy
 
 from can_msgs.msg import Frame
 from std_srvs.srv import Trigger, TriggerRequest
@@ -66,23 +65,26 @@ class CanMessageHandler:
             raise NameError("Unhandled message id: %i" % msg_id)
 
 
-class VescCanDriver:
+class VescCanDriver(rclpy.Node):
 
     _active_vesc_id = None
 
-    vesc_tool_id = 254
-    known_vesc_ids = []
-    known_vescs = []  # type: List[Vesc]
+    vesc_tool_id: int = 254
+    known_vesc_ids: List[int] = []
+    known_vescs: List[Vesc] = []
 
-    def __init__(self, motor_poles, gear_ratio, cont_current_lim):
+    def __init__(self, motor_poles:int , gear_ratio: float, cont_current_lim: float):
+        super().__init__("vesc_can_driver")
+        self.get_logger().info('Starting vesc can driver' )
+
         self.motor_poles = motor_poles
         self.gear_ratio = gear_ratio
 
         # Subscribe to can topics
-        rospy.Subscriber("/received_messages", Frame, callback=self.can_cb)
+        self.create_subscription(Frame, "/received_messages", self.can_cb, 10)
 
         # Make publisher to send can messages
-        self.send_can_msg_pub = rospy.Publisher("sent_messages", Frame, queue_size=1)
+        self.send_can_msg_pub = self.create_publisher(Frame, "sent_messages", 1)
 
         # Initialize CAN message handler and add message types
         self.can_msg_handler = CanMessageHandler()
@@ -175,8 +177,6 @@ class VescCanDriver:
 
 
 if __name__ == '__main__':
-    rospy.init_node("vesc_can_driver")
-    rospy.loginfo("Starting vesc can driver")
 
     motor_poles = rospy.get_param("~motor_poles")
     gear_ratio = rospy.get_param("~gear_ratio")

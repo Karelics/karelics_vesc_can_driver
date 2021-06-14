@@ -1,0 +1,19 @@
+{
+  "package_name": "karelics_vesc_can_driver",
+  "output_dir": "/home/mart/dev/karelics_vesc_ros2/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_typesupport_introspection_cpp/karelics_vesc_can_driver",
+  "template_dir": "/opt/ros/foxy/share/rosidl_typesupport_introspection_cpp/resource",
+  "idl_tuples": [
+    "/home/mart/dev/karelics_vesc_ros2/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_adapter/karelics_vesc_can_driver:msg/VescStatus.idl"
+  ],
+  "target_dependencies": [
+    "/opt/ros/foxy/lib/rosidl_typesupport_introspection_cpp/rosidl_typesupport_introspection_cpp",
+    "/opt/ros/foxy/lib/python3.8/site-packages/rosidl_typesupport_introspection_cpp/__init__.py",
+    "/opt/ros/foxy/share/rosidl_typesupport_introspection_cpp/resource/idl__rosidl_typesupport_introspection_cpp.hpp.em",
+    "/opt/ros/foxy/share/rosidl_typesupport_introspection_cpp/resource/idl__type_support.cpp.em",
+    "/opt/ros/foxy/share/rosidl_typesupport_introspection_cpp/resource/msg__rosidl_typesupport_introspection_cpp.hpp.em",
+    "/opt/ros/foxy/share/rosidl_typesupport_introspection_cpp/resource/msg__type_support.cpp.em",
+    "/opt/ros/foxy/share/rosidl_typesupport_introspection_cpp/resource/srv__rosidl_typesupport_introspection_cpp.hpp.em",
+    "/opt/ros/foxy/share/rosidl_typesupport_introspection_cpp/resource/srv__type_support.cpp.em",
+    "/home/mart/dev/karelics_vesc_ros2/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_adapter/karelics_vesc_can_driver/msg/VescStatus.idl"
+  ]
+}

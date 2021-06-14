@@ -1,0 +1,26 @@
+{
+  "package_name": "karelics_vesc_can_driver",
+  "output_dir": "/home/mart/dev/karelics_vesc_ros2/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_generator_cpp/karelics_vesc_can_driver",
+  "template_dir": "/opt/ros/foxy/share/rosidl_generator_cpp/cmake/../resource",
+  "idl_tuples": [
+    "/home/mart/dev/karelics_vesc_ros2/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_adapter/karelics_vesc_can_driver:msg/VescStatus.idl"
+  ],
+  "target_dependencies": [
+    "/opt/ros/foxy/share/rosidl_generator_cpp/cmake/../../../lib/rosidl_generator_cpp/rosidl_generator_cpp",
+    "/opt/ros/foxy/share/rosidl_generator_cpp/cmake/../../../lib/python3.8/site-packages/rosidl_generator_cpp/__init__.py",
+    "/opt/ros/foxy/share/rosidl_generator_cpp/cmake/../resource/action__builder.hpp.em",
+    "/opt/ros/foxy/share/rosidl_generator_cpp/cmake/../resource/action__struct.hpp.em",
+    "/opt/ros/foxy/share/rosidl_generator_cpp/cmake/../resource/action__traits.hpp.em",
+    "/opt/ros/foxy/share/rosidl_generator_cpp/cmake/../resource/idl.hpp.em",
+    "/opt/ros/foxy/share/rosidl_generator_cpp/cmake/../resource/idl__builder.hpp.em",
+    "/opt/ros/foxy/share/rosidl_generator_cpp/cmake/../resource/idl__struct.hpp.em",
+    "/opt/ros/foxy/share/rosidl_generator_cpp/cmake/../resource/idl__traits.hpp.em",
+    "/opt/ros/foxy/share/rosidl_generator_cpp/cmake/../resource/msg__builder.hpp.em",
+    "/opt/ros/foxy/share/rosidl_generator_cpp/cmake/../resource/msg__struct.hpp.em",
+    "/opt/ros/foxy/share/rosidl_generator_cpp/cmake/../resource/msg__traits.hpp.em",
+    "/opt/ros/foxy/share/rosidl_generator_cpp/cmake/../resource/srv__builder.hpp.em",
+    "/opt/ros/foxy/share/rosidl_generator_cpp/cmake/../resource/srv__struct.hpp.em",
+    "/opt/ros/foxy/share/rosidl_generator_cpp/cmake/../resource/srv__traits.hpp.em",
+    "/home/mart/dev/karelics_vesc_ros2/src/karelics_vesc_can_driver/build/karelics_vesc_can_driver/rosidl_adapter/karelics_vesc_can_driver/msg/VescStatus.idl"
+  ]
+}

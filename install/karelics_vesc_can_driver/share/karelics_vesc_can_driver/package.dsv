@@ -1,0 +1,14 @@
+source;share/karelics_vesc_can_driver/hook/cmake_prefix_path.ps1
+source;share/karelics_vesc_can_driver/hook/cmake_prefix_path.dsv
+source;share/karelics_vesc_can_driver/hook/cmake_prefix_path.sh
+source;share/karelics_vesc_can_driver/hook/ld_library_path_lib.ps1
+source;share/karelics_vesc_can_driver/hook/ld_library_path_lib.dsv
+source;share/karelics_vesc_can_driver/hook/ld_library_path_lib.sh
+source;share/karelics_vesc_can_driver/hook/pythonpath.ps1
+source;share/karelics_vesc_can_driver/hook/pythonpath.dsv
+source;share/karelics_vesc_can_driver/hook/pythonpath.sh
+source;share/karelics_vesc_can_driver/local_setup.bash
+source;share/karelics_vesc_can_driver/local_setup.dsv
+source;share/karelics_vesc_can_driver/local_setup.ps1
+source;share/karelics_vesc_can_driver/local_setup.sh
+source;share/karelics_vesc_can_driver/local_setup.zsh
