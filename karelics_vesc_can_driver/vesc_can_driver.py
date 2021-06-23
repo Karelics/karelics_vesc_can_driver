@@ -1,9 +1,11 @@
 from typing import List, Union
+import sys
 
+from rclpy.node import Node
 import rclpy
 
 from can_msgs.msg import Frame
-from std_srvs.srv import Trigger, TriggerRequest
+from std_srvs.srv import Trigger
 
 from karelics_vesc_can_driver.vesc_messages import *
 from karelics_vesc_can_driver.vesc import *
@@ -65,7 +67,7 @@ class CanMessageHandler:
             raise NameError("Unhandled message id: %i" % msg_id)
 
 
-class VescCanDriver(rclpy.Node):
+class VescCanDriver(Node):
 
     _active_vesc_id = None
 
@@ -73,18 +75,25 @@ class VescCanDriver(rclpy.Node):
     known_vesc_ids: List[int] = []
     known_vescs: List[Vesc] = []
 
-    def __init__(self, motor_poles:int , gear_ratio: float, cont_current_lim: float):
+    def __init__(self):
         super().__init__("vesc_can_driver")
-        self.get_logger().info('Starting vesc can driver' )
 
-        self.motor_poles = motor_poles
-        self.gear_ratio = gear_ratio
+        self.declare_parameter('motor_poles')
+        self.motor_poles = self.get_parameter('motor_poles').value
+
+        self.declare_parameter('gear_ration')
+        self.gear_ratio = self.get_parameter('gear_ratio').value
+
+        self.declare_parameter('continuous_current_limit')
+        self.cont_current_lim = self.get_parameter('continuous_current_limit').value
+
+        self.get_logger().info('Starting vesc can driver')
 
         # Subscribe to can topics
-        self.create_subscription(Frame, "/received_messages", self.can_cb, 10)
+        self.create_subscription(Frame, "/received_messages", self.can_cb, qos_profile=10)
 
         # Make publisher to send can messages
-        self.send_can_msg_pub = self.create_publisher(Frame, "sent_messages", 1)
+        self.send_can_msg_pub = self.create_publisher(Frame, "sent_messages", qos_profile=1)
 
         # Initialize CAN message handler and add message types
         self.can_msg_handler = CanMessageHandler()
@@ -107,7 +116,7 @@ class VescCanDriver(rclpy.Node):
         self.can_msg_handler.register_message(self.vesc_imu_msg)
 
         # Set Current monitor to ensure battery health
-        self.current_monitor = MonitorMaxCurrent(cont_current_lim)
+        self.current_monitor = MonitorMaxCurrent(node=self, cont_current_lim=self.cont_current_lim)
 
     def aquire_vesc_tool_id_lock(self, vesc_id):
         if self._active_vesc_id and self._active_vesc_id != vesc_id:
@@ -120,6 +129,7 @@ class VescCanDriver(rclpy.Node):
         self._active_vesc_id = None
 
     def can_cb(self, msg: Frame):
+        # TODO: needs rework according to ros2_socketcan
         """
         Callback for the /recieved_msg topic published by the roscan_bridge.
         :param msg: The Can message
@@ -130,13 +140,7 @@ class VescCanDriver(rclpy.Node):
         """
         [vesc_id, can_msg_id] = CanMsg.decode_frame_id(msg)
 
-        # if vesc_id != 1:
-            # print(vesc_id)
-            # print(msg)
-            # return
-
         # Check if we already know the vesc this message comes from, if not add it to the known vesc
-
         if vesc_id != self.vesc_tool_id:
             if vesc_id not in self.known_vesc_ids:
                 self.known_vesc_ids.append(vesc_id)
@@ -164,7 +168,7 @@ class VescCanDriver(rclpy.Node):
                 can_msg.update_vesc_state(current_vesc)
 
         except NameError as e:
-            rospy.loginfo(str(e))
+            self.get_logger().info(str(e))
 
         # Publish the current status of the vescs in to ros world
         # TODO Why do we do this for all the vescs? Should we process tick only for the current_vesc?
@@ -175,9 +179,9 @@ class VescCanDriver(rclpy.Node):
 
 
 if __name__ == '__main__':
+    rclpy.init(args=sys.argv)
+    karelics_vesc_can_driver_node = VescCanDriver()
 
-    motor_poles = rospy.get_param("~motor_poles")
-    gear_ratio = rospy.get_param("~gear_ratio")
-    cont_current_lim = rospy.get_param("~continuous_current_limit")
-    vesc_can_driver = VescCanDriver(motor_poles, gear_ratio, cont_current_lim)
-    rospy.spin()
+    rclpy.spin(karelics_vesc_can_driver_node)
+
+    rclpy.shutdown()

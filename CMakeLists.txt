@@ -37,18 +37,6 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-# Install Python modules
-ament_python_install_package(${PROJECT_NAME})
-
-# Install Python executables
-install(PROGRAMS
-  DESTINATION lib/${PROJECT_NAME}
-)
-
-ament_export_dependencies(${PROJECT_NAME}
-  rclcpp, rclpy, joy, sensor_msgs, std_msgs, std_srvs
-)
-
 set(msg_files
   "msg/VescStatus.msg"
 )
@@ -57,6 +45,19 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   ${msg_files}
   DEPENDENCIES builtin_interfaces sensor_msgs std_msgs std_srvs
   ADD_LINTER_TESTS
+)
+
+# Install Python modules
+ament_python_install_package(${PROJECT_NAME})
+
+# Install Python executables
+install(PROGRAMS
+  karelics_vesc_can_driver/vesc_can_driver.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+ament_export_dependencies(${PROJECT_NAME}
+  rclcpp, rclpy, can_msgs, sensor_msgs, std_msgs, std_srvs
 )
 
 ament_package()
