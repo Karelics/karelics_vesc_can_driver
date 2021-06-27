@@ -185,6 +185,10 @@ class CanMsg(metaclass=ABCMeta):
         for b in struct.pack(">i", value):
             self.out_buffer.append(b)
 
+    def encode_int64(self, value):
+        for b in struct.pack(">q", value):
+            self.out_buffer.append(b)
+
     def encode_uint32(self, value):
         for b in struct.pack(">I", value):
             self.out_buffer.append(b)
@@ -447,6 +451,7 @@ class VescSetDuty(CanMsg):
     def get_encoded_msg(self):
         self.start_msg()
         self.encode_int32(int(self.duty_cycle * 100000))
+        self.encode_int32(int(0))
         return self.out_buffer
 
 
@@ -459,6 +464,7 @@ class VescSetCurrent(CanMsg):
     def get_encoded_msg(self):
         self.start_msg()
         self.encode_int32(int(self.current * 1000))
+        self.encode_int32(int(0))
         return self.out_buffer
 
 
@@ -471,6 +477,7 @@ class VescSetBrakeCurrent(CanMsg):
     def get_encoded_msg(self):
         self.start_msg()
         self.encode_int32(int(self.current * 1000))
+        self.encode_int32(int(0))
         return self.out_buffer
 
 
@@ -483,19 +490,20 @@ class VescSetHandbrakeCurrent(CanMsg):
     def get_encoded_msg(self):
         self.start_msg()
         self.encode_int32(int(self.current*1000))
+        self.encode_int32(int(0))
         return self.out_buffer
 
 
 class VescSetRPM(CanMsg):
 
-    def __init__(self, rpm):
+    def __init__(self, rpm=0.0):
         super(VescSetRPM, self).__init__(msg_id=CanIds.CAN_PACKET_SET_RPM)
         self.rpm = rpm
 
     def get_encoded_msg(self):
         self.start_msg()
         self.encode_float32(float(self.rpm))
-        # self.encode_float32(float(0))
+        self.encode_float32(float(0))
         return self.out_buffer
 
 
@@ -508,6 +516,7 @@ class VescSetPos(CanMsg):
     def get_encoded_msg(self):
         self.start_msg()
         self.encode_int32(int(self.pos))
+        self.encode_int32(int(0))
         return self.out_buffer
 
 
@@ -524,6 +533,7 @@ class VescSetCurrentRel(CanMsg):
     def get_encoded_msg(self):
         self.start_msg()
         self.encode_float32(int(self.current))
+        self.encode_float32(int(0))
         return self.out_buffer
 
 

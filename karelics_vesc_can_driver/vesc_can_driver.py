@@ -102,20 +102,37 @@ class VescCanDriver(Node):
         self.can_msg_handler.set_append_msg_ids(CanIds.CAN_PACKET_FILL_RX_BUFFER, CanIds.CAN_PACKET_FILL_RX_BUFFER_LONG)
         self.can_msg_handler.set_process_buffer_msg_id(CanIds.CAN_PACKET_PROCESS_RX_BUFFER)
 
+        # incoming message types from the VESC
         self.vesc_status_msg = VescStatusMsg()
         self.vesc_status2_msg = VescStatus2Msg()
         self.vesc_status3_msg = VescStatus3Msg()
         self.vesc_status4_msg = VescStatus4Msg()
         self.vesc_status5_msg = VescStatus5Msg()
-
         self.vesc_imu_msg = VescIMUData()
-
         self.can_msg_handler.register_message(self.vesc_status_msg)
         self.can_msg_handler.register_message(self.vesc_status2_msg)
         self.can_msg_handler.register_message(self.vesc_status3_msg)
         self.can_msg_handler.register_message(self.vesc_status4_msg)
         self.can_msg_handler.register_message(self.vesc_status5_msg)
         self.can_msg_handler.register_message(self.vesc_imu_msg)
+
+        # outgoing message types to the VESC
+        self.vesc_set_duty_msg = VescSetDuty()
+        self.vesc_set_current_msg = VescSetCurrent()
+        self.vesc_set_brake_current_msg = VescSetBrakeCurrent()
+        self.vesc_set_rpm_msg = VescSetRPM()
+        self.vesc_set_pos_msg = VescSetPos()
+        self.vesc_set_current_rel_msg = VescSetCurrentRel()
+        self.vesc_set_hb_msg = VescSetHandbrakeCurrent()
+        self.vesc_get_imu_data_msg = VescGetImuData()
+        self.can_msg_handler.register_message(self.vesc_set_duty_msg)
+        self.can_msg_handler.register_message(self.vesc_set_current_msg)
+        self.can_msg_handler.register_message(self.vesc_set_brake_current_msg)
+        self.can_msg_handler.register_message(self.vesc_set_rpm_msg)
+        self.can_msg_handler.register_message(self.vesc_set_pos_msg)
+        self.can_msg_handler.register_message(self.vesc_set_current_rel_msg)
+        self.can_msg_handler.register_message(self.vesc_set_hb_msg)
+        self.can_msg_handler.register_message(self.vesc_get_imu_data_msg)
 
         # Set Current monitor to ensure battery health
         self.current_monitor = MonitorMaxCurrent(node=self, cont_current_lim=self.cont_current_lim)

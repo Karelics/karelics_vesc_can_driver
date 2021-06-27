@@ -189,32 +189,60 @@ class Vesc:
     def set_current_cb(self, msg: Float32):
         current_msg = VescSetCurrent(current=msg.data)
         self.send_cb(current_msg.get_can_msg(self.vesc_id))
-        pass
+        try:
+            can_frame = current_msg.get_can_msg(self.vesc_id)
+            self.send_cb(can_frame)
+            self.node.get_logger().info("sent CURRENT frame")
+        except AssertionError as e:
+            self.node.get_logger().error(str(e))
 
     def set_brake_cb(self, msg: Float32):
         brake_current_msg = VescSetBrakeCurrent(current=msg.data)
         self.send_cb(brake_current_msg.get_can_msg(self.vesc_id))
-        pass
+        try:
+            can_frame = brake_current_msg.get_can_msg(self.vesc_id)
+            self.send_cb(can_frame)
+            self.node.get_logger().info("sent BRAKE_CURRENT frame")
+        except AssertionError as e:
+            self.node.get_logger().error(str(e))
 
     def set_handbrake_current_cb(self, msg: Float32):
         handbrake_current_msg = VescSetHandbrakeCurrent(current=msg.data)
-        self.send_cb(handbrake_current_msg.get_can_msg(self.vesc_id))
-        pass
+        try:
+            can_frame = handbrake_current_msg.get_can_msg(self.vesc_id)
+            self.send_cb(can_frame)
+            self.node.get_logger().info("sent HANDBRAKE_CURRENT frame")
+        except AssertionError as e:
+            self.node.get_logger().error(str(e))
 
     def set_duty_cycle_cb(self, msg: Float32):
         dutycyle_msg = VescSetDuty(dutycycle=msg.data)
-        self.send_cb(dutycyle_msg.get_can_msg(self.vesc_id))
+        try:
+            can_frame = dutycyle_msg.get_can_msg(self.vesc_id)
+            self.send_cb(can_frame)
+            self.node.get_logger().info("sent DUTY_CYCLE frame")
+        except AssertionError as e:
+            self.node.get_logger().error(str(e))
 
     def set_position_cb(self, msg: Float32):
         pos_msg = VescSetPos(pos=msg.data)
-        self.send_cb(pos_msg.get_can_msg(self.vesc_id))
+        try:
+            can_frame = pos_msg.get_can_msg(self.vesc_id)
+            self.send_cb(can_frame)
+            self.node.get_logger().info("sent POS frame")
+        except AssertionError as e:
+            self.node.get_logger().error(str(e))
 
     def set_erpm_cb(self, msg: Float32):
         if not self.current_monitor.is_safe():
             msg.data = 0
         rpm_msg = VescSetRPM(rpm=msg.data)
-        self.send_cb(rpm_msg.get_can_msg(self.vesc_id))
-        pass
+        try:
+            can_frame = rpm_msg.get_can_msg(self.vesc_id)
+            self.send_cb(can_frame)
+            self.node.get_logger().info("sent ERPM frame")
+        except AssertionError as e:
+            self.node.get_logger().error(str(e))
 
     def set_rpm_cb(self, msg: Float32):
         if not self.current_monitor.is_safe():
