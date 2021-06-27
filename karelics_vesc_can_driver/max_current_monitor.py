@@ -106,10 +106,10 @@ class TimeDeque:
         total_currents = []
         for _, v in self.time_deque:
             total_currents.append(v)
-        med = self.median(total_currents)
+        med = float(self.median(total_currents))
         msg_data = Float32()
         msg_data.data = med
-        self.pub.publish(med)
+        self.pub.publish(msg_data)
         return med
 
     @staticmethod

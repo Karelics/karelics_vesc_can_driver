@@ -1,11 +1,13 @@
+#!/usr/bin/env python3
+
 from typing import List, Union
 import sys
 
+from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 import rclpy
 
 from can_msgs.msg import Frame
-from std_srvs.srv import Trigger
 
 from karelics_vesc_can_driver.vesc_messages import *
 from karelics_vesc_can_driver.vesc import *
@@ -81,7 +83,7 @@ class VescCanDriver(Node):
         self.declare_parameter('motor_poles')
         self.motor_poles = self.get_parameter('motor_poles').value
 
-        self.declare_parameter('gear_ration')
+        self.declare_parameter('gear_ratio')
         self.gear_ratio = self.get_parameter('gear_ratio').value
 
         self.declare_parameter('continuous_current_limit')
@@ -90,10 +92,10 @@ class VescCanDriver(Node):
         self.get_logger().info('Starting vesc can driver')
 
         # Subscribe to can topics
-        self.create_subscription(Frame, "/received_messages", self.can_cb, qos_profile=10)
+        self.create_subscription(Frame, "/from_can_bus", self.can_cb, qos_profile=10)
 
         # Make publisher to send can messages
-        self.send_can_msg_pub = self.create_publisher(Frame, "sent_messages", qos_profile=1)
+        self.send_can_msg_pub = self.create_publisher(Frame, "/to_can_bus", qos_profile=1)
 
         # Initialize CAN message handler and add message types
         self.can_msg_handler = CanMessageHandler()
@@ -129,9 +131,8 @@ class VescCanDriver(Node):
         self._active_vesc_id = None
 
     def can_cb(self, msg: Frame):
-        # TODO: needs rework according to ros2_socketcan
         """
-        Callback for the /recieved_msg topic published by the roscan_bridge.
+        Callback for the /from_can_bus topic published by the ros2_socketcan package.
         :param msg: The Can message
         :return: none
         In this callback the message ID is decoded into a vesc_id and can_msg_id.
@@ -144,7 +145,8 @@ class VescCanDriver(Node):
         if vesc_id != self.vesc_tool_id:
             if vesc_id not in self.known_vesc_ids:
                 self.known_vesc_ids.append(vesc_id)
-                self.known_vescs.append(Vesc(vesc_id=vesc_id,
+                self.known_vescs.append(Vesc(node=self,
+                                             vesc_id=vesc_id,
                                              send_function=self.send_can_msg_pub.publish,
                                              lock_function=self.aquire_vesc_tool_id_lock,
                                              release_function=self.release_vesc_tool_id_lock,
@@ -166,7 +168,6 @@ class VescCanDriver(Node):
             can_msg = self.can_msg_handler.process_message(msg_id=can_msg_id, data=msg.data)
             if can_msg:
                 can_msg.update_vesc_state(current_vesc)
-
         except NameError as e:
             self.get_logger().info(str(e))
 
@@ -182,6 +183,12 @@ if __name__ == '__main__':
     rclpy.init(args=sys.argv)
     karelics_vesc_can_driver_node = VescCanDriver()
 
+    # executor = MultiThreadedExecutor()
+    # executor.add_node(karelics_vesc_can_driver_node)
+    #
+    # executor.spin()
     rclpy.spin(karelics_vesc_can_driver_node)
-
+    karelics_vesc_can_driver_node.destroy_node()
     rclpy.shutdown()
+
+

@@ -8,11 +8,12 @@ from karelics_vesc_can_driver.msg import VescStatus
 from karelics_vesc_can_driver.vesc_messages import *
 
 
-class Vesc(Node):
+class Vesc:
 
-    def __init__(self, vesc_id, send_function, lock_function, release_function, motor_poles, gear_ratio,
+    def __init__(self, node: Node, vesc_id, send_function, lock_function, release_function, motor_poles, gear_ratio,
                  current_monitor):
-        super().__init__('karelics_vesc_can_driver')
+
+        self.node = node
 
         self._get_imu_data = False
         self._request_send = False
@@ -24,54 +25,59 @@ class Vesc(Node):
 
         # Status message
         self.erpm = 0
-        self.duty_cycle = 0
-        self.current = 0
+        self.duty_cycle = 0.0
+        self.current = 0.0
         # Status message 2
-        self.amp_hours = 0
-        self.amp_hours_charged = 0
+        self.amp_hours = 0.0
+        self.amp_hours_charged = 0.0
         # Status message 3
-        self.watt_hours = 0
-        self.watt_hours_charged = 0
+        self.watt_hours = 0.0
+        self.watt_hours_charged = 0.0
         # Status message 4
-        self.temp_fet = 0
-        self.temp_motor = 0
-        self.current_in = 0
-        self.pid_pos_now = 0
+        self.temp_fet = 0.0
+        self.temp_motor = 0.0
+        self.current_in = 0.0
+        self.pid_pos_now = 0.0
         # Status message 5
-        self.tacho_value = 0
-        self.v_in = 0
+        self.tacho_value = 0.0
+        self.v_in = 0.0
         # Imu message
-        self.roll = 0
-        self.pitch = 0
-        self.yaw = 0
-        self.accX = 0
-        self.accY = 0
-        self.accZ = 0
-        self.gyroX = 0
-        self.gyroY = 0
-        self.gyroZ = 0
-        self.magX = 0
-        self.magY = 0
-        self.magZ = 0
-        self.q0 = 0
-        self.q1 = 0
-        self.q2 = 0
-        self.q3 = 0
+        self.roll = 0.0
+        self.pitch = 0.0
+        self.yaw = 0.0
+        self.accX = 0.0
+        self.accY = 0.0
+        self.accZ = 0.0
+        self.gyroX = 0.0
+        self.gyroY = 0.0
+        self.gyroZ = 0.0
+        self.magX = 0.0
+        self.magY = 0.0
+        self.magZ = 0.0
+        self.q0 = 0.0
+        self.q1 = 0.0
+        self.q2 = 0.0
+        self.q3 = 0.0
 
         # Subscribe to cmd topics
-        self.create_subscription(Float32, f'vesc_{self.vesc_id}/set/current', self.set_current_cb, qos_profile=1)
-        self.create_subscription(Float32, f'vesc_{self.vesc_id}/set/brake_current', self.set_brake_cb, qos_profile=1)
-        self.create_subscription(Float32, f'vesc_{self.vesc_id}/set/duty_cycle', self.set_duty_cycle_cb, qos_profile=1)
-        self.create_subscription(Float32, f'vesc_{self.vesc_id}/set/position', self.set_position_cb, qos_profile=1)
-        self.create_subscription(Float32, f'vesc_{self.vesc_id}/set/erpm', self.set_erpm_cb, qos_profile=1)
-        self.create_subscription(Float32, f'vesc_{self.vesc_id}/set/rpm', self.set_rpm_cb, qos_profile=1)
+        self.node.create_subscription(Float32, f'vesc_{self.vesc_id}/set/current', self.set_current_cb, qos_profile=1)
+        self.node.create_subscription(Float32, f'vesc_{self.vesc_id}/set/brake_current', self.set_brake_cb,
+                                      qos_profile=1)
+        self.node.create_subscription(Float32, f'vesc_{self.vesc_id}/set/handbrake_current',
+                                      self.set_handbrake_current_cb,
+                                      qos_profile=1)
+        self.node.create_subscription(Float32, f'vesc_{self.vesc_id}/set/duty_cycle', self.set_duty_cycle_cb,
+                                      qos_profile=1)
+        self.node.create_subscription(Float32, f'vesc_{self.vesc_id}/set/position', self.set_position_cb, qos_profile=1)
+        self.node.create_subscription(Float32, f'vesc_{self.vesc_id}/set/erpm', self.set_erpm_cb, qos_profile=1)
+        self.node.create_subscription(Float32, f'vesc_{self.vesc_id}/set/rpm', self.set_rpm_cb, qos_profile=1)
 
         # Setup vesc status Publisher
-        self.status_pub = self.create_publisher(VescStatus, f'vesc_{self.vesc_id}/status', qos_profile=1)
-        self.imu_pub = self.create_publisher(Imu, f'vesc_{self.vesc_id}/imu_data', qos_profile=1)
+        self.status_pub = self.node.create_publisher(VescStatus, f'vesc_{self.vesc_id}/status', qos_profile=1)
+        self.imu_pub = self.node.create_publisher(Imu, f'vesc_{self.vesc_id}/imu_data', qos_profile=1)
 
         # Enable IMU
-        self.create_service(SetBool, f'vesc_{self.vesc_id}/enable_imu', self.enable_imu_cb)
+        self.node.create_service(SetBool, f'vesc_{self.vesc_id}/enable_imu', self.enable_imu_cb)
 
         self.send_cb = send_function
         self.lock = lock_function
@@ -105,7 +111,7 @@ class Vesc(Node):
             imu_msg = Imu()
             imu_msg.header = Header()
             imu_msg.header.frame_id = "vesc_%i_frame" % self.vesc_id
-            imu_msg.header.stamp = self.get_clock().now().to_msg()
+            imu_msg.header.stamp = self.node.get_clock().now().to_msg()
 
             imu_msg.orientation.x = self.q0
             imu_msg.orientation.y = self.q1
@@ -125,10 +131,10 @@ class Vesc(Node):
     def tick(self):
         status_msg = VescStatus()
         status_msg.header = Header()
-        status_msg.header.stamp = self.get_clock()
+        status_msg.header.stamp = self.node.get_clock().now().to_msg()
 
         status_msg.erpm = int(self.erpm)
-        status_msg.rpm = int(self.erpm / (self.motor_poles/2) / self.gear_ratio)
+        status_msg.rpm = int(self.erpm / (self.motor_poles / 2) / self.gear_ratio)
         status_msg.duty_cycle = self.duty_cycle
         status_msg.current = self.current
         status_msg.amp_hours = self.amp_hours
@@ -139,9 +145,9 @@ class Vesc(Node):
         status_msg.temp_motor = self.temp_motor
         status_msg.current_in = self.current_in
         status_msg.pid_pos_now = self.pid_pos_now
-        status_msg.tacho_value = self.tacho_value
+        status_msg.tacho_value = float(self.tacho_value)
         status_msg.v_in = self.v_in
-        status_msg.rotations = self.tacho_value / self.motor_poles / 3 / self.gear_ratio
+        status_msg.rotations = float(self.tacho_value / self.motor_poles / 3 / self.gear_ratio)
 
         self.status_pub.publish(status_msg)
 
@@ -190,6 +196,11 @@ class Vesc(Node):
         self.send_cb(brake_current_msg.get_can_msg(self.vesc_id))
         pass
 
+    def set_handbrake_current_cb(self, msg: Float32):
+        handbrake_current_msg = VescSetHandbrakeCurrent(current=msg.data)
+        self.send_cb(handbrake_current_msg.get_can_msg(self.vesc_id))
+        pass
+
     def set_duty_cycle_cb(self, msg: Float32):
         dutycyle_msg = VescSetDuty(dutycycle=msg.data)
         self.send_cb(dutycyle_msg.get_can_msg(self.vesc_id))
@@ -208,6 +219,10 @@ class Vesc(Node):
     def set_rpm_cb(self, msg: Float32):
         if not self.current_monitor.is_safe():
             msg.data = 0
-        rpm_msg = VescSetRPM(rpm=msg.data * (self.motor_poles/2) * self.gear_ratio)
-        self.send_cb(rpm_msg.get_can_msg(self.vesc_id))
-        pass
+        rpm_msg = VescSetRPM(rpm=float(msg.data * (self.motor_poles / 2) * self.gear_ratio))
+        try:
+            can_frame = rpm_msg.get_can_msg(self.vesc_id)
+            self.send_cb(can_frame)
+            self.node.get_logger().info("sent RPM frame")
+        except AssertionError as e:
+            self.node.get_logger().error(str(e))

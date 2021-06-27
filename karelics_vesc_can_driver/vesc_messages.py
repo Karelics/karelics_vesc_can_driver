@@ -168,7 +168,6 @@ class CanMsg(metaclass=ABCMeta):
         return data
 
     def pop_uint16(self):
-
         data = struct.unpack(">H", self.in_buffer[self.pointer:self.pointer + 2])[0]
         self.pointer += 2
         return data
@@ -208,6 +207,10 @@ class CanMsg(metaclass=ABCMeta):
 
     def encode_float32(self, value):
         for b in struct.pack(">f", value):
+            self.out_buffer.append(b)
+
+    def encode_float64(self, value):
+        for b in struct.pack(">d", value):
             self.out_buffer.append(b)
 
     def set_data(self, data: bytes):
@@ -435,7 +438,6 @@ class VescIMUData(ComMsg):
 
 
 # Out going messages
-
 class VescSetDuty(CanMsg):
 
     def __init__(self, dutycycle=0):
@@ -472,6 +474,18 @@ class VescSetBrakeCurrent(CanMsg):
         return self.out_buffer
 
 
+class VescSetHandbrakeCurrent(CanMsg):
+
+    def __init__(self, current=0):
+        super(VescSetHandbrakeCurrent, self).__init__(msg_id=CanIds.CAN_PACKET_SET_CURRENT_HANDBRAKE)
+        self.current = current
+
+    def get_encoded_msg(self):
+        self.start_msg()
+        self.encode_int32(int(self.current*1000))
+        return self.out_buffer
+
+
 class VescSetRPM(CanMsg):
 
     def __init__(self, rpm):
@@ -480,7 +494,8 @@ class VescSetRPM(CanMsg):
 
     def get_encoded_msg(self):
         self.start_msg()
-        self.encode_int32(int(self.rpm))
+        self.encode_float32(float(self.rpm))
+        # self.encode_float32(float(0))
         return self.out_buffer
 
 
