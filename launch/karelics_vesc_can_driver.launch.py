@@ -10,28 +10,40 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 PACKAGE_PATH = get_package_share_directory("karelics_vesc_can_driver")
+KARELICS_ROBOT = os.environ['KARELICS_ROBOT']
 
 
 def generate_launch_description():
-    motor_poles = LaunchConfiguration('motor_poles')
-    gear_ratio = LaunchConfiguration('gear_ratio')
-    continuous_current_limit = LaunchConfiguration('continuous_current_limit')
     interface = LaunchConfiguration('interface')
     receiver_interval_sec = LaunchConfiguration('receiver_interval_sec')
     sender_timeout_sec = LaunchConfiguration('sender_timeout_sec')
     emulate_tty = LaunchConfiguration('emulate_tty')
+
+    if KARELICS_ROBOT == 'sampo':
+        motor_poles = '8'
+        gear_ratio = '1'
+        continuous_current_limit = '120'
+    elif KARELICS_ROBOT == 'antero':
+        motor_poles = '14'
+        gear_ratio = '5.846'
+        continuous_current_limit = '120'
+    else:
+        motor_poles = '14'
+        gear_ratio = '5.846'
+        continuous_current_limit = '120'
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'motor_poles',
-            default_value='14'
+            default_value=motor_poles
         ),
         DeclareLaunchArgument(
             'gear_ratio',
-            default_value='5.846'
+            default_value=gear_ratio
         ),
         DeclareLaunchArgument(
             'continuous_current_limit',
-            default_value='120'
+            default_value=continuous_current_limit
         ),
         DeclareLaunchArgument(
             'interface',
