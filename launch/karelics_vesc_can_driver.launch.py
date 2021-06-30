@@ -10,6 +10,7 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 PACKAGE_PATH = get_package_share_directory("karelics_vesc_can_driver")
+
 KARELICS_ROBOT = os.environ['KARELICS_ROBOT']
 
 
@@ -19,7 +20,7 @@ def generate_launch_description():
     sender_timeout_sec = LaunchConfiguration('sender_timeout_sec')
     emulate_tty = LaunchConfiguration('emulate_tty')
 
-    if KARELICS_ROBOT == 'sampo':
+    if KARELICS_ROBOT == 'disinfection':
         motor_poles = '8'
         gear_ratio = '1'
         continuous_current_limit = '120'

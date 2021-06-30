@@ -243,8 +243,34 @@ class CanMsg(metaclass=ABCMeta):
         can_msg = Frame()
         can_msg.is_extended = True
         can_msg.id = self.get_encoded_msg_id(vesc_id)
-        can_msg.data = self.get_encoded_msg()
+        self.get_encoded_msg()
         can_msg.dlc = len(self.out_buffer)
+        if len(self.out_buffer) < 8:
+            # apply 0 padding to the out buffer if the encoded data is less that 8 bytes
+            no_of_bytes_to_fill = 8 - len(self.out_buffer)
+            if no_of_bytes_to_fill == 1:
+                self.encode_int8(0)
+            elif no_of_bytes_to_fill == 2:
+                self.encode_int16(0)
+            elif no_of_bytes_to_fill == 3:
+                self.encode_int16(0)
+                self.encode_int8(0)
+            elif no_of_bytes_to_fill == 4:
+                self.encode_int32(0)
+            elif no_of_bytes_to_fill == 5:
+                self.encode_int32(0)
+                self.encode_int8(0)
+            elif no_of_bytes_to_fill == 6:
+                self.encode_int32(0)
+                self.encode_int16(0)
+            elif no_of_bytes_to_fill == 7:
+                self.encode_int32(0)
+                self.encode_int16(0)
+                self.encode_int8(0)
+            elif no_of_bytes_to_fill == 8:  # edge case should never happen but just to be sure
+                self.encode_float64(float(0))
+
+        can_msg.data = self.out_buffer
 
         return can_msg
 
@@ -451,7 +477,6 @@ class VescSetDuty(CanMsg):
     def get_encoded_msg(self):
         self.start_msg()
         self.encode_int32(int(self.duty_cycle * 100000))
-        self.encode_int32(int(0))
         return self.out_buffer
 
 
@@ -464,7 +489,6 @@ class VescSetCurrent(CanMsg):
     def get_encoded_msg(self):
         self.start_msg()
         self.encode_int32(int(self.current * 1000))
-        self.encode_int32(int(0))
         return self.out_buffer
 
 
@@ -477,7 +501,6 @@ class VescSetBrakeCurrent(CanMsg):
     def get_encoded_msg(self):
         self.start_msg()
         self.encode_int32(int(self.current * 1000))
-        self.encode_int32(int(0))
         return self.out_buffer
 
 
@@ -490,7 +513,6 @@ class VescSetHandbrakeCurrent(CanMsg):
     def get_encoded_msg(self):
         self.start_msg()
         self.encode_int32(int(self.current*1000))
-        self.encode_int32(int(0))
         return self.out_buffer
 
 
@@ -502,8 +524,7 @@ class VescSetRPM(CanMsg):
 
     def get_encoded_msg(self):
         self.start_msg()
-        self.encode_float32(float(self.rpm))
-        self.encode_float32(float(0))
+        self.encode_int32(int(self.rpm))
         return self.out_buffer
 
 
@@ -516,7 +537,6 @@ class VescSetPos(CanMsg):
     def get_encoded_msg(self):
         self.start_msg()
         self.encode_int32(int(self.pos))
-        self.encode_int32(int(0))
         return self.out_buffer
 
 
@@ -533,7 +553,6 @@ class VescSetCurrentRel(CanMsg):
     def get_encoded_msg(self):
         self.start_msg()
         self.encode_float32(int(self.current))
-        self.encode_float32(int(0))
         return self.out_buffer
 
 
@@ -546,6 +565,6 @@ class VescGetImuData(CanMsg):
         self.start_msg()
         self.encode_uint8(0xFE)  # VescTool ID
         self.encode_uint8(0x0)  # Not Used
-        self.encode_uint8(0x41)  # Not Used
+        self.encode_uint8(ComPacketID.COMM_GET_IMU_DATA)
         self.encode_uint16(0xFFFF)
         return self.out_buffer

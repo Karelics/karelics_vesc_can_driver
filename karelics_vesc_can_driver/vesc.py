@@ -192,7 +192,6 @@ class Vesc:
         try:
             can_frame = current_msg.get_can_msg(self.vesc_id)
             self.send_cb(can_frame)
-            self.node.get_logger().info("sent CURRENT frame")
         except AssertionError as e:
             self.node.get_logger().error(str(e))
 
@@ -202,7 +201,6 @@ class Vesc:
         try:
             can_frame = brake_current_msg.get_can_msg(self.vesc_id)
             self.send_cb(can_frame)
-            self.node.get_logger().info("sent BRAKE_CURRENT frame")
         except AssertionError as e:
             self.node.get_logger().error(str(e))
 
@@ -211,7 +209,6 @@ class Vesc:
         try:
             can_frame = handbrake_current_msg.get_can_msg(self.vesc_id)
             self.send_cb(can_frame)
-            self.node.get_logger().info("sent HANDBRAKE_CURRENT frame")
         except AssertionError as e:
             self.node.get_logger().error(str(e))
 
@@ -220,7 +217,6 @@ class Vesc:
         try:
             can_frame = dutycyle_msg.get_can_msg(self.vesc_id)
             self.send_cb(can_frame)
-            self.node.get_logger().info("sent DUTY_CYCLE frame")
         except AssertionError as e:
             self.node.get_logger().error(str(e))
 
@@ -229,7 +225,6 @@ class Vesc:
         try:
             can_frame = pos_msg.get_can_msg(self.vesc_id)
             self.send_cb(can_frame)
-            self.node.get_logger().info("sent POS frame")
         except AssertionError as e:
             self.node.get_logger().error(str(e))
 
@@ -240,7 +235,6 @@ class Vesc:
         try:
             can_frame = rpm_msg.get_can_msg(self.vesc_id)
             self.send_cb(can_frame)
-            self.node.get_logger().info("sent ERPM frame")
         except AssertionError as e:
             self.node.get_logger().error(str(e))
 
@@ -251,6 +245,5 @@ class Vesc:
         try:
             can_frame = rpm_msg.get_can_msg(self.vesc_id)
             self.send_cb(can_frame)
-            self.node.get_logger().info("sent RPM frame")
         except AssertionError as e:
             self.node.get_logger().error(str(e))

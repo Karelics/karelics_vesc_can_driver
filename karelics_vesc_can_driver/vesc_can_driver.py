@@ -81,13 +81,13 @@ class VescCanDriver(Node):
         super().__init__("vesc_can_driver")
 
         self.declare_parameter('motor_poles')
-        self.motor_poles = self.get_parameter('motor_poles').value
+        self.motor_poles = int(self.get_parameter('motor_poles').value)
 
         self.declare_parameter('gear_ratio')
-        self.gear_ratio = self.get_parameter('gear_ratio').value
+        self.gear_ratio = float(self.get_parameter('gear_ratio').value)
 
         self.declare_parameter('continuous_current_limit')
-        self.cont_current_lim = self.get_parameter('continuous_current_limit').value
+        self.cont_current_lim = int(self.get_parameter('continuous_current_limit').value)
 
         self.get_logger().info('Starting vesc can driver')
 
@@ -199,13 +199,6 @@ class VescCanDriver(Node):
 if __name__ == '__main__':
     rclpy.init(args=sys.argv)
     karelics_vesc_can_driver_node = VescCanDriver()
-
-    # executor = MultiThreadedExecutor()
-    # executor.add_node(karelics_vesc_can_driver_node)
-    #
-    # executor.spin()
     rclpy.spin(karelics_vesc_can_driver_node)
     karelics_vesc_can_driver_node.destroy_node()
     rclpy.shutdown()
-
-
