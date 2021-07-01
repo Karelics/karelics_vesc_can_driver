@@ -1,9 +1,0 @@
-CMake Error at /opt/ros/foxy/share/rosidl_cmake/cmake/rosidl_generate_interfaces.cmake:93 (message):
-  rosidl_generate_interfaces() the passed file 'VescStatus.msg' doesn't exist
-  relative to the CMAKE_CURRENT_SOURCE_DIR
-  '/home/mart/dev/karelics_vesc/src/karelics_vesc_can_driver'
-Call Stack (most recent call first):
-  CMakeLists.txt:25 (rosidl_generate_interfaces)
-
-
-make: *** [Makefile:222: cmake_check_build_system] Error 1

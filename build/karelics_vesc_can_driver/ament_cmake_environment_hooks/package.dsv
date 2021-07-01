@@ -1,4 +1,0 @@
-source;share/karelics_vesc_can_driver/local_setup.bash
-source;share/karelics_vesc_can_driver/local_setup.dsv
-source;share/karelics_vesc_can_driver/local_setup.sh
-source;share/karelics_vesc_can_driver/local_setup.zsh
