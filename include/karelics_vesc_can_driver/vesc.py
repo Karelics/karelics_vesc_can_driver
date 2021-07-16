@@ -59,6 +59,7 @@ class Vesc:
         # Subscribe to cmd topics
         rospy.Subscriber("vesc_%i/set/current" % self.vesc_id, Float32, self.set_current_cb)
         rospy.Subscriber("vesc_%i/set/brake_current" % self.vesc_id, Float32, self.set_brake_cb)
+        rospy.Subscriber("vesc_%i/set/handbrake_current" % self.vesc_id, Float32, self.set_handbrake_current_cb)
         rospy.Subscriber("vesc_%i/set/duty_cycle" % self.vesc_id, Float32, self.set_duty_cycle_cb)
         rospy.Subscriber("vesc_%i/set/position" % self.vesc_id, Float32, self.set_position_cb)
         rospy.Subscriber("vesc_%i/set/erpm" % self.vesc_id, Float32, self.set_erpm_cb)
@@ -189,6 +190,11 @@ class Vesc:
     def set_brake_cb(self, msg: Float32):
         brake_current_msg = VescSetBrakeCurrent(current=msg.data)
         self.send_cb(brake_current_msg.get_can_msg(self.vesc_id))
+        pass
+
+    def set_handbrake_current_cb(self, msg: Float32):
+        handbrake_current_msg = VescSetHandbrakeCurrent(current=msg.data)
+        self.send_cb(handbrake_current_msg.get_can_msg(self.vesc_id))
         pass
 
     def set_duty_cycle_cb(self, msg: Float32):

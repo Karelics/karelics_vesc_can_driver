@@ -9,6 +9,7 @@ from std_srvs.srv import Trigger, TriggerRequest
 from karelics_vesc_can_driver.vesc_messages import *
 from karelics_vesc_can_driver.vesc import *
 from karelics_vesc_can_driver.max_current_monitor import MonitorMaxCurrent
+from karelics_vesc_can_driver.battery_status import BatteryStatus
 
 
 class CanMessageHandler:
@@ -107,6 +108,9 @@ class VescCanDriver:
         # Set Current monitor to ensure battery health
         self.current_monitor = MonitorMaxCurrent(cont_current_lim)
 
+        # Publish battery state
+        self.battery_status = BatteryStatus()
+
     def aquire_vesc_tool_id_lock(self, vesc_id):
         if self._active_vesc_id and self._active_vesc_id != vesc_id:
             return False
@@ -168,10 +172,17 @@ class VescCanDriver:
 
         # Publish the current status of the vescs in to ros world
         # TODO Why do we do this for all the vescs? Should we process tick only for the current_vesc?
+        vesc = None
         for vesc in self.known_vescs:
             vesc.tick()
 
+        if vesc is not None:
+            self.publish_battery_state(vesc.v_in)
+
         self.current_monitor.tick(self.known_vescs)
+
+    def publish_battery_state(self, voltage):
+        self.battery_status.publish(voltage)
 
 
 if __name__ == '__main__':
