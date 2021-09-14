@@ -188,7 +188,6 @@ class Vesc:
 
     def set_current_cb(self, msg: Float32):
         current_msg = VescSetCurrent(current=msg.data)
-        self.send_cb(current_msg.get_can_msg(self.vesc_id))
         try:
             can_frame = current_msg.get_can_msg(self.vesc_id)
             self.send_cb(can_frame)
@@ -197,7 +196,6 @@ class Vesc:
 
     def set_brake_cb(self, msg: Float32):
         brake_current_msg = VescSetBrakeCurrent(current=msg.data)
-        self.send_cb(brake_current_msg.get_can_msg(self.vesc_id))
         try:
             can_frame = brake_current_msg.get_can_msg(self.vesc_id)
             self.send_cb(can_frame)
@@ -230,7 +228,7 @@ class Vesc:
 
     def set_erpm_cb(self, msg: Float32):
         if not self.current_monitor.is_safe():
-            msg.data = 0
+            msg.data = 0.0
         rpm_msg = VescSetRPM(rpm=msg.data)
         try:
             can_frame = rpm_msg.get_can_msg(self.vesc_id)
@@ -240,7 +238,7 @@ class Vesc:
 
     def set_rpm_cb(self, msg: Float32):
         if not self.current_monitor.is_safe():
-            msg.data = 0
+            msg.data = 0.0
         rpm_msg = VescSetRPM(rpm=float(msg.data * (self.motor_poles / 2) * self.gear_ratio))
         try:
             can_frame = rpm_msg.get_can_msg(self.vesc_id)

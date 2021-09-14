@@ -7,12 +7,14 @@ from std_msgs.msg import Float32
 
 
 class MonitorMaxCurrent:
-    """ Monitors the total motor current to ensure that we are not discharging battery over
-        the battery's continuous maximum discharge limit. Implementation works so that
-        during the time-window of max_draw_time*2 we check how many times have have
-        crossed cont_current_lim. If more than half of the times, the motor is set on cool-down.
-        This is required to monitor max discharge correctly also during fast spikes.
-        TODO Currently only set_erpm and set_rpm functions use this in vesc.py. """
+    """
+    Monitors the total motor current to ensure that we are not discharging battery over
+    the battery's continuous maximum discharge limit. Implementation works so that
+    during the time-window of max_draw_time*2 we check how many times have have
+    crossed cont_current_lim. If more than half of the times, the motor is set on cool-down.
+    This is required to monitor max discharge correctly also during fast spikes.
+    TODO: Currently only set_erpm and set_rpm functions use this in vesc.py.
+    """
 
     def __init__(self, node: Node, cont_current_lim, max_draw_time=2.0):
         """
