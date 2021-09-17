@@ -18,9 +18,9 @@ def launch_setup(context, *args, **kwargs):
 
     emulate_tty = LaunchConfiguration('emulate_tty')
 
-    motor_poles = LaunchConfiguration('motor_poles').perform(context)
-    gear_ratio = LaunchConfiguration('gear_ratio').perform(context)
-    continuous_current_limit = LaunchConfiguration('continuous_current_limit').perform(context)
+    motor_poles = LaunchConfiguration('motor_poles')
+    gear_ratio = LaunchConfiguration('gear_ratio')
+    continuous_current_limit = LaunchConfiguration('continuous_current_limit')
 
     emulate_tty_declare = DeclareLaunchArgument(
         'emulate_tty',
