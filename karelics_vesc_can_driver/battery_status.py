@@ -36,13 +36,13 @@ class BatteryStatus:
             upper_percentage = self.key_voltages[i][1]
 
             if i == last_index-1:
-                return upper_percentage
+                return float(upper_percentage)
 
             lower_volt = self.key_voltages[i+1][0]
             lower_percentage = self.key_voltages[i+1][1]
             if i == 0 and curr_voltage > upper_volt:
-                return upper_percentage
+                return float(upper_percentage)
             elif upper_volt > curr_voltage > lower_volt:
-                percentage = (curr_voltage - lower_volt) / (upper_volt - lower_volt)
-                scaled_percentage = lower_percentage + (upper_percentage - lower_percentage) * percentage
+                percentage = float((curr_voltage - lower_volt) / (upper_volt - lower_volt))
+                scaled_percentage = float(lower_percentage + (upper_percentage - lower_percentage) * percentage)
                 return scaled_percentage
