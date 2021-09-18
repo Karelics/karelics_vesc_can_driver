@@ -69,8 +69,8 @@ def launch_setup(context, *args, **kwargs):
 
 def generate_launch_description():
     return LaunchDescription([
-        DeclareLaunchArgument('motor_poles', default_value='14'),
-        DeclareLaunchArgument('gear_ratio', default_value='5.846'),
-        DeclareLaunchArgument('continuous_current_limit', default_value='120'),
+        DeclareLaunchArgument('motor_poles'),
+        DeclareLaunchArgument('gear_ratio'),
+        DeclareLaunchArgument('continuous_current_limit'),
         OpaqueFunction(function=launch_setup),
     ])
