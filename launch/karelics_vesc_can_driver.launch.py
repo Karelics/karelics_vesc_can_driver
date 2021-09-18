@@ -18,9 +18,9 @@ def launch_setup(context, *args, **kwargs):
 
     emulate_tty = LaunchConfiguration('emulate_tty')
 
-    motor_poles = LaunchConfiguration('motor_poles')
-    gear_ratio = LaunchConfiguration('gear_ratio')
-    continuous_current_limit = LaunchConfiguration('continuous_current_limit')
+    motor_poles = LaunchConfiguration('motor_poles').perform(context)
+    gear_ratio = LaunchConfiguration('gear_ratio').perform(context)
+    continuous_current_limit = LaunchConfiguration('continuous_current_limit').perform(context)
 
     emulate_tty_declare = DeclareLaunchArgument(
         'emulate_tty',
@@ -64,11 +64,13 @@ def launch_setup(context, *args, **kwargs):
         vesc_can_driver,
     ]
 
+    return launch_list
+
 
 def generate_launch_description():
     return LaunchDescription([
-        DeclareLaunchArgument('motor_poles', default_value='0'),
-        DeclareLaunchArgument('gear_ratio', default_value='0.0'),
-        DeclareLaunchArgument('continuous_current_limit', default_value='0'),
+        DeclareLaunchArgument('motor_poles', default_value='14'),
+        DeclareLaunchArgument('gear_ratio', default_value='5.846'),
+        DeclareLaunchArgument('continuous_current_limit', default_value='120'),
         OpaqueFunction(function=launch_setup),
     ])
