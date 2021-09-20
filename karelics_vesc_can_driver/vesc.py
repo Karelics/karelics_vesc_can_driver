@@ -146,7 +146,7 @@ class Vesc:
         status_msg.current_in = self.current_in
         status_msg.pid_pos_now = self.pid_pos_now
         status_msg.tacho_value = float(self.tacho_value)
-        status_msg.v_in = self.v_in
+        status_msg.v_in = float(self.v_in)
         status_msg.rotations = float(self.tacho_value / self.motor_poles / 3 / self.gear_ratio)
 
         self.status_pub.publish(status_msg)
