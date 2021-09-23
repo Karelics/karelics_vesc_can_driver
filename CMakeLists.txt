@@ -53,11 +53,6 @@ ament_python_install_package(${PROJECT_NAME})
 # Install Python executables
 install(PROGRAMS
   karelics_vesc_can_driver/vesc_can_driver.py
-  karelics_vesc_can_driver/battery_status.py
-  karelics_vesc_can_driver/karelics_vesc_can_driver_utils.py
-  karelics_vesc_can_driver/max_current_monitor.py
-  karelics_vesc_can_driver/vesc.py
-  karelics_vesc_can_driver/vesc_messages.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
