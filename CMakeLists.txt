@@ -56,11 +56,6 @@ install(PROGRAMS
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(DIRECTORY
-  karelics_vesc_can_driver
-  DESTINATION lib/${PROJECT_NAME}
-)
-
 ament_export_dependencies(${PROJECT_NAME}
   rclcpp, rclpy, can_msgs, sensor_msgs, std_msgs, std_srvs
 )
