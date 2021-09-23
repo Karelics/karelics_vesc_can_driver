@@ -2,7 +2,7 @@ from collections import deque
 
 from rclpy.node import Node
 
-from karelics_vesc_can_driver_utils import get_current_time_seconds
+from karelics_vesc_can_driver.utils import get_current_time_seconds
 from std_msgs.msg import Float32
 
 
