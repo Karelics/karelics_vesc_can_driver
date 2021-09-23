@@ -23,6 +23,7 @@ find_package(std_srvs REQUIRED)
 
 install(DIRECTORY
   launch
+  karelics_vesc_can_driver
   DESTINATION share/${PROJECT_NAME}/
 )
 
