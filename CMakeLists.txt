@@ -23,7 +23,6 @@ find_package(std_srvs REQUIRED)
 
 install(DIRECTORY
   launch
-  karelics_vesc_can_driver
   DESTINATION share/${PROJECT_NAME}/
 )
 
@@ -54,6 +53,11 @@ ament_python_install_package(${PROJECT_NAME})
 # Install Python executables
 install(PROGRAMS
   karelics_vesc_can_driver/vesc_can_driver.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(DIRECTORY
+  karelics_vesc_can_driver
   DESTINATION lib/${PROJECT_NAME}
 )
 
