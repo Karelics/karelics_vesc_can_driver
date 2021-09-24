@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
+import sys
 
+import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import BatteryState
 
 
 class BatteryStatus(Node):
-    def __init__(self, vesc_can_driver_node: Node):
+    def __init__(self):
 
         self.battery_pub = self.create_publisher(BatteryState, "/battery", qos_profile=1)
 
-        # self.battery_pub_timer = self.create_timer(1.0, self.publish_battery_percentage)
-
-        self.vesc_can_driver_node = vesc_can_driver_node
+        self.battery_pub_timer = self.create_timer(1.0, self.publish_battery_percentage)
 
         self.vesc_status_subs = []
         self.vesc_voltages = []
@@ -28,9 +28,12 @@ class BatteryStatus(Node):
                              [40, 0]]
 
     def get_vesc_status_subs(self):
-        topics = self.vesc_can_driver_node.get_topic_names_and_types()
+        node_names_and_namespaces = self.get_node_names_and_namespaces()
+
+        # topics = self.get_publisher_names_and_types_by_node(node_name, node_namespace, no_demangle=False)
+
         print()
-        print(topics)
+        print(node_names_and_namespaces)
         print()
 
     def publish_battery_percentage(self, voltage):
@@ -59,3 +62,11 @@ class BatteryStatus(Node):
                 percentage = float((curr_voltage - lower_volt) / (upper_volt - lower_volt))
                 scaled_percentage = float(lower_percentage + (upper_percentage - lower_percentage) * percentage)
                 return scaled_percentage
+
+
+if __name__ == '__main__':
+    rclpy.init(args=sys.argv)
+    battery_status_node = BatteryStatus()
+    rclpy.spin(battery_status_node)
+    battery_status_node.destroy_node()
+    rclpy.shutdown()
