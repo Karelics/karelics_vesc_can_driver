@@ -3,7 +3,6 @@
 from typing import List, Union
 import sys
 
-from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 import rclpy
 
@@ -192,20 +191,15 @@ class VescCanDriver(Node):
         except NameError as e:
             self.get_logger().info(str(e))
 
-        # Publish the current status of the vescs in to ros world
-        # TODO: Why do we do this for all the vescs? Should we process tick only for the current_vesc?
-        # TODO: talk with mart about this? is it for timestamping and synchronization across vescs?
-        vesc = None
-        for vesc in self.known_vescs:
-            vesc.tick()
-
-        if vesc is not None:
-            self.publish_battery_state(vesc.v_in)
+        # Publish the current status of the current vesc in to ros world
+        current_vesc.tick()
 
         self.current_monitor.tick(self.known_vescs)
 
+        self.publish_battery_state(current_vesc.v_in)
+
     def publish_battery_state(self, voltage):
-        self.battery_status.publish(voltage)
+        self.battery_status.publish_battery_percentage(voltage)
 
 
 if __name__ == '__main__':

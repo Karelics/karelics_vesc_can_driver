@@ -4,15 +4,19 @@ from rclpy.node import Node
 from sensor_msgs.msg import BatteryState
 
 
-class BatteryStatus:
-    def __init__(self, node: Node):
-        """
-        node: the parent node that is instantiating the BatteryStatus class
-        """
+class BatteryStatus(Node):
+    def __init__(self):
 
-        self.parent_node = node
+        self.battery_pub = self.create_publisher(BatteryState, "/battery", qos_profile=1)
 
-        self.battery_pub = self.parent_node.create_publisher(BatteryState, "/battery", qos_profile=1)
+        # self.battery_pub_timer = self.create_timer(1.0, self.publish_battery_percentage)
+
+        self.vesc_can_driver_node = None
+
+        self.vesc_status_subs = []
+        self.vesc_voltages = []
+
+        self.current_battery_voltage = None
 
         # voltage, percentage. All the other voltage values between these key-values
         # are linearly calculated
@@ -23,7 +27,16 @@ class BatteryStatus:
                              [41.8, 0.02],
                              [40, 0]]
 
-    def publish(self, voltage):
+    def get_vesc_status_subs(self):
+        self.vesc_can_driver_node = Node('karelics_vesc_can_driver')
+        if self.vesc_can_driver_node is not None:
+            topics = self.vesc_can_driver_node.get_topic_names_and_types()
+            print(topics)
+
+    def publish_battery_percentage(self, voltage):
+        # get vesc status topics. If there are new ones, register subs to them and get the data
+        self.get_vesc_status_subs()
+
         battery_state = BatteryState()
         battery_state.voltage = voltage
         battery_state.percentage = self.get_battery_percentage(voltage)
