@@ -31,6 +31,7 @@ class BatteryStatus(Node):
         self.vesc_can_driver_node = Node('karelics_vesc_can_driver')
         if self.vesc_can_driver_node is not None:
             topics = self.vesc_can_driver_node.get_topic_names_and_types()
+            print("AAAAAAAAAAAAAAAAAAAAAAA")
             print(topics)
 
     def publish_battery_percentage(self, voltage):
