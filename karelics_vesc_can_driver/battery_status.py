@@ -5,13 +5,13 @@ from sensor_msgs.msg import BatteryState
 
 
 class BatteryStatus(Node):
-    def __init__(self):
+    def __init__(self, vesc_can_driver_node: Node):
 
         self.battery_pub = self.create_publisher(BatteryState, "/battery", qos_profile=1)
 
         # self.battery_pub_timer = self.create_timer(1.0, self.publish_battery_percentage)
 
-        self.vesc_can_driver_node = None
+        self.vesc_can_driver_node = vesc_can_driver_node
 
         self.vesc_status_subs = []
         self.vesc_voltages = []
@@ -28,11 +28,10 @@ class BatteryStatus(Node):
                              [40, 0]]
 
     def get_vesc_status_subs(self):
-        self.vesc_can_driver_node = Node('karelics_vesc_can_driver')
-        if self.vesc_can_driver_node is not None:
-            topics = self.vesc_can_driver_node.get_topic_names_and_types()
-            print("AAAAAAAAAAAAAAAAAAAAAAA")
-            print(topics)
+        topics = self.vesc_can_driver_node.get_topic_names_and_types()
+        print()
+        print(topics)
+        print()
 
     def publish_battery_percentage(self, voltage):
         # get vesc status topics. If there are new ones, register subs to them and get the data

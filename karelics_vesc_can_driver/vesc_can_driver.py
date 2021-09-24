@@ -138,7 +138,7 @@ class VescCanDriver(Node):
         self.current_monitor = MonitorMaxCurrent(node=self, cont_current_lim=self.cont_current_lim)
 
         # Publish battery state
-        self.battery_status = BatteryStatus(node=self)
+        self.battery_status = BatteryStatus(vesc_can_driver_node=self)
 
     def aquire_vesc_tool_id_lock(self, vesc_id):
         if self._active_vesc_id and self._active_vesc_id != vesc_id:
