@@ -63,9 +63,7 @@ def launch_setup(context, *args, **kwargs):
         name='battery_status_node',
         output='screen',
         emulate_tty=emulate_tty,
-        parameters=[{
-
-        }],
+        parameters=[],
     )
 
     launch_list += [

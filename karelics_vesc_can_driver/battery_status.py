@@ -36,13 +36,13 @@ class BatteryStatus(Node):
         print(node_names_and_namespaces)
         print()
 
-    def publish_battery_percentage(self, voltage):
+    def publish_battery_percentage(self):
         # get vesc status topics. If there are new ones, register subs to them and get the data
         self.get_vesc_status_subs()
 
         battery_state = BatteryState()
-        battery_state.voltage = voltage
-        battery_state.percentage = self.get_battery_percentage(voltage)
+        battery_state.voltage = 40.0  # temporary battery voltage placeholder
+        battery_state.percentage = self.get_battery_percentage(40.0)
         self.battery_pub.publish(battery_state)
 
     def get_battery_percentage(self, curr_voltage):
