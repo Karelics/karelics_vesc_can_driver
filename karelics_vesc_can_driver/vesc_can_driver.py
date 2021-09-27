@@ -3,15 +3,14 @@
 from typing import List, Union
 import sys
 
-from rclpy.node import Node
 import rclpy
+from rclpy.node import Node
 
 from can_msgs.msg import Frame
 
 from karelics_vesc_can_driver.vesc_messages import *
 from karelics_vesc_can_driver.vesc import *
 from karelics_vesc_can_driver.max_current_monitor import MonitorMaxCurrent
-from karelics_vesc_can_driver.battery_status import BatteryStatus
 
 
 class CanMessageHandler:

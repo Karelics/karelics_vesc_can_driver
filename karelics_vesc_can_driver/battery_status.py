@@ -8,6 +8,7 @@ from sensor_msgs.msg import BatteryState
 
 class BatteryStatus(Node):
     def __init__(self):
+        super().__init__("battery_status")
 
         self.battery_pub = self.create_publisher(BatteryState, "/battery", qos_profile=1)
 
