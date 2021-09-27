@@ -71,7 +71,7 @@ def launch_setup(context, *args, **kwargs):
         socket_can_receiver,
         socket_can_sender,
         vesc_can_driver,
-        battery_status,
+        # battery_status,
     ]
 
     return launch_list
