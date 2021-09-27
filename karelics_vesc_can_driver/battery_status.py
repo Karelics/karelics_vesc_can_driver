@@ -29,12 +29,10 @@ class BatteryStatus(Node):
                              [40, 0]]
 
     def get_vesc_status_subs(self):
-        node_names_and_namespaces = self.get_node_names_and_namespaces()
-
-        # topics = self.get_publisher_names_and_types_by_node(node_name, node_namespace, no_demangle=False)
+        topics = self.get_publisher_names_and_types_by_node('karelics_vesc_can_driver', '/', no_demangle=False)
 
         print()
-        print(node_names_and_namespaces)
+        print(topics)
         print()
 
     def publish_battery_percentage(self):
