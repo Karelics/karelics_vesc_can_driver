@@ -35,7 +35,10 @@ class BatteryStatus(Node):
         self.vesc_voltages[vesc] = float(data.v_in)
 
     def get_mean_battery_voltage(self):
-        return float(sum(list(self.vesc_voltages.values()))/len(self.vesc_voltages))
+        if len(self.vesc_voltages) != 0:
+            return float(sum(list(self.vesc_voltages.values()))/len(self.vesc_voltages))
+        else:
+            return 0.0
 
     def get_vesc_status_topics(self):
         topics_and_types = self.get_publisher_names_and_types_by_node('karelics_vesc_can_driver', '/', no_demangle=False)
