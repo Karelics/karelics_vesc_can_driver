@@ -14,7 +14,8 @@ class BatteryStatus(Node):
 
         self.battery_pub_timer = self.create_timer(1.0, self.publish_battery_percentage)
 
-        self.vesc_status_subs = []
+        self.vesc_status_topics = []
+        self.vesc_status_subscribers = []
         self.vesc_voltages = []
 
         self.current_battery_voltage = None
@@ -28,16 +29,21 @@ class BatteryStatus(Node):
                              [41.8, 0.02],
                              [40, 0]]
 
-    def get_vesc_status_subs(self):
-        topics = self.get_publisher_names_and_types_by_node('karelics_vesc_can_driver', '/', no_demangle=False)
+    def get_vesc_status_subscribers(self):
+        topics_and_types = self.get_publisher_names_and_types_by_node('karelics_vesc_can_driver', '/', no_demangle=False)
+        status_topics = []
+
+        for topic_tuple in topics_and_types:
+            if '/status' in topic_tuple[0]:
+                status_topics.append(topic_tuple[0])
 
         print()
-        print(topics)
+        print(status_topics)
         print()
 
     def publish_battery_percentage(self):
         # get vesc status topics. If there are new ones, register subs to them and get the data
-        self.get_vesc_status_subs()
+        self.get_vesc_status_subscribers()
 
         battery_state = BatteryState()
         battery_state.voltage = 40.0  # temporary battery voltage placeholder
