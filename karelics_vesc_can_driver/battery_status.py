@@ -32,8 +32,10 @@ class BatteryStatus(Node):
                              [40, 0]]
 
     def vesc_status_cb(self, data, vesc):
-        # TODO
-        return
+        self.vesc_voltages[vesc] = float(data.v_in)
+
+    def get_mean_battery_voltage(self):
+        return float(sum(list(self.vesc_voltages.values()))/len(self.vesc_voltages))
 
     def get_vesc_status_topics(self):
         topics_and_types = self.get_publisher_names_and_types_by_node('karelics_vesc_can_driver', '/', no_demangle=False)
@@ -50,29 +52,47 @@ class BatteryStatus(Node):
     def vesc_from_topic(topic):
         return list(filter(None, topic.split(sep='/')))[0]
 
-    def get_vesc_status_subscribers(self, topics_list):
-        # no new subscribers to add
-        if len(self.vesc_status_subscribers) == len(topics_list):
-            return
+    def create_new_status_sub(self, topic, vesc_from_current_topic):
+        status_sub = self.create_subscription(VescStatus, topic, partial(self.vesc_status_cb,
+                                                                         vesc=vesc_from_current_topic),
+                                              qos_profile=1)
+        self.vesc_status_subscribers[vesc_from_current_topic] = status_sub
 
+    def get_vesc_status_subscribers(self, topics_list):
         # create all the subs
         if len(self.vesc_status_subscribers) == 0:
             for topic in topics_list:
                 vesc_from_current_topic = self.vesc_from_topic(topic)
-                status_sub = self.create_subscription(VescStatus, topic, partial(self.vesc_status_cb,
-                                                                                 vesc=vesc_from_current_topic),
-                                                      qos_profile=1)
-                self.vesc_status_subscribers[vesc_from_current_topic] = status_sub
+                self.create_new_status_sub(topic, vesc_from_current_topic)
+        else:
+            # check if we have new vescs
+            for topic in topics_list:
+                new_vesc = True  # True - new vesc, sub needs to be registered
+                                 # False - vesc was already there
+                vesc_from_current_topic = self.vesc_from_topic(topic)
+                for existing_vesc in self.vesc_status_subscribers:
+                    if vesc_from_current_topic == existing_vesc:
+                        new_vesc = False
+                        break
+                if new_vesc:
+                    self.create_new_status_sub(topic, vesc_from_current_topic)
 
-        # we have new vescs, create new subs
-        if len(self.vesc_status_subscribers) < len(topics_list):
-            # TODO
-            return
-
-        # we have less vescs, remove/destroy old subs
-        if len(self.vesc_status_subscribers) > len(topics_list):
-            # TODO
-            return
+            # check if we have old, inactive vescs
+            for vesc, vesc_sub in self.vesc_status_subscribers.items():
+                old_vesc = True  # True - old vesc, no longer active, sub needs to be destroyed
+                                 # False - vesc still active, do nothing
+                for topic in topics_list:
+                    vesc_from_current_topic = self.vesc_from_topic(topic)
+                    if vesc == vesc_from_current_topic:
+                        old_vesc = False
+                        break
+                if old_vesc:
+                    # destroy and remove old sub from dict
+                    self.destroy_subscription(vesc_sub)
+                    if self.vesc_status_subscribers.get(vesc):
+                        del self.vesc_status_subscribers[vesc]
+                    if self.vesc_voltages.get(vesc):
+                        del self.vesc_voltages[vesc]
 
     def publish_battery_percentage(self):
         # get vesc status topics. If there are new ones, register subs to them and get the data
@@ -81,9 +101,11 @@ class BatteryStatus(Node):
 
         print(self.vesc_status_subscribers)
 
+        mean_battery_voltage = self.get_mean_battery_voltage()
+
         battery_state = BatteryState()
-        battery_state.voltage = 40.0  # temporary battery voltage placeholder
-        battery_state.percentage = self.get_battery_percentage(40.0)
+        battery_state.voltage = mean_battery_voltage
+        battery_state.percentage = self.get_battery_percentage(mean_battery_voltage)
         self.battery_pub.publish(battery_state)
 
     def get_battery_percentage(self, curr_voltage):
