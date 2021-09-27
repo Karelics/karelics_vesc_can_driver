@@ -47,9 +47,6 @@ class BatteryStatus(Node):
             topics_and_types = self.get_publisher_names_and_types_by_node('karelics_vesc_can_driver',
                                                                           '/', no_demangle=False)
         except (NodeNameNonExistentError, RuntimeError):
-            topics_and_types = None
-
-        if topics_and_types is None:
             return vesc_status_topics
 
         string_topic_format = re.compile(r'/vesc_(\d+)/status')  # RegEx template to find all existing vesc status topics
