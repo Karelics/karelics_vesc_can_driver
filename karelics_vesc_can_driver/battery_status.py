@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import re
 import sys
 
 import rclpy
@@ -32,9 +33,10 @@ class BatteryStatus(Node):
     def get_vesc_status_subscribers(self):
         topics_and_types = self.get_publisher_names_and_types_by_node('karelics_vesc_can_driver', '/', no_demangle=False)
         status_topics = []
+        string_topic_format = re.compile(r'/vesc_(\d+)/status')
 
         for topic_tuple in topics_and_types:
-            if '/status' in topic_tuple[0]:
+            if string_topic_format.match(topic_tuple[0]):
                 status_topics.append(topic_tuple[0])
 
         print()
