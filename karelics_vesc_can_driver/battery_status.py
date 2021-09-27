@@ -4,7 +4,7 @@ import re
 import sys
 
 import rclpy
-from rclpy.node import Node
+from rclpy.node import Node, NodeNameNonExistentError
 from sensor_msgs.msg import BatteryState
 
 from karelics_vesc_can_driver.msg import VescStatus
@@ -41,8 +41,17 @@ class BatteryStatus(Node):
             return 0.0
 
     def get_vesc_status_topics(self):
-        topics_and_types = self.get_publisher_names_and_types_by_node('karelics_vesc_can_driver', '/', no_demangle=False)
         vesc_status_topics = []
+
+        try:
+            topics_and_types = self.get_publisher_names_and_types_by_node('karelics_vesc_can_driver',
+                                                                          '/', no_demangle=False)
+        except (NodeNameNonExistentError, RuntimeError):
+            topics_and_types = None
+
+        if topics_and_types is None:
+            return vesc_status_topics
+
         string_topic_format = re.compile(r'/vesc_(\d+)/status')  # RegEx template to find all existing vesc status topics
 
         for topic_tuple in topics_and_types:
