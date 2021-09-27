@@ -57,14 +57,14 @@ def launch_setup(context, *args, **kwargs):
                      'continuous_current_limit': continuous_current_limit}],
     )
 
-    battery_status = Node(
-        package='karelics_vesc_can_driver',
-        executable='battery_status.py',
-        name='battery_status_node',
-        output='screen',
-        emulate_tty=emulate_tty,
-        parameters=[],
-    )
+    # battery_status = Node(
+    #     package='karelics_vesc_can_driver',
+    #     executable='battery_status.py',
+    #     name='battery_status_node',
+    #     output='screen',
+    #     emulate_tty=emulate_tty,
+    #     parameters=[],
+    # )
 
     launch_list += [
         emulate_tty_declare,
