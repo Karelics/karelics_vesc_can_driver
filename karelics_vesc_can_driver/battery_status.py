@@ -36,7 +36,7 @@ class BatteryStatus(Node):
 
     def get_mean_battery_voltage(self):
         if len(self.vesc_voltages) != 0:
-            return float(sum(list(self.vesc_voltages.values()))/len(self.vesc_voltages))
+            return float(sum(list(self.vesc_voltages.values())) / len(self.vesc_voltages))
         else:
             return 0.0
 
@@ -49,7 +49,8 @@ class BatteryStatus(Node):
         except (NodeNameNonExistentError, RuntimeError):
             return vesc_status_topics
 
-        string_topic_format = re.compile(r'/vesc_(\d+)/status')  # RegEx template to find all existing vesc status topics
+        string_topic_format = re.compile(
+            r'/vesc_(\d+)/status')  # RegEx template to find all existing vesc status topics
 
         for topic_tuple in topics_and_types:
             if string_topic_format.match(topic_tuple[0]):
@@ -68,40 +69,22 @@ class BatteryStatus(Node):
         self.vesc_status_subscribers[vesc_from_current_topic] = status_sub
 
     def get_vesc_status_subscribers(self, topics_list):
-        # create all the subs
-        if len(self.vesc_status_subscribers) == 0:
-            for topic in topics_list:
-                vesc_from_current_topic = self.vesc_from_topic(topic)
+        # check if we have new vescs
+        for topic in topics_list:
+            vesc_from_current_topic = self.vesc_from_topic(topic)
+            if vesc_from_current_topic not in self.vesc_status_subscribers.keys():
                 self.create_new_status_sub(topic, vesc_from_current_topic)
-        else:
-            # check if we have new vescs
-            for topic in topics_list:
-                new_vesc = True  # True - new vesc, sub needs to be registered
-                                 # False - vesc was already there
-                vesc_from_current_topic = self.vesc_from_topic(topic)
-                for existing_vesc in self.vesc_status_subscribers:
-                    if vesc_from_current_topic == existing_vesc:
-                        new_vesc = False
-                        break
-                if new_vesc:
-                    self.create_new_status_sub(topic, vesc_from_current_topic)
 
-            # check if we have old, inactive vescs
-            for vesc, vesc_sub in self.vesc_status_subscribers.items():
-                old_vesc = True  # True - old vesc, no longer active, sub needs to be destroyed
-                                 # False - vesc still active, do nothing
-                for topic in topics_list:
-                    vesc_from_current_topic = self.vesc_from_topic(topic)
-                    if vesc == vesc_from_current_topic:
-                        old_vesc = False
-                        break
-                if old_vesc:
-                    # destroy and remove old sub from dict
-                    self.destroy_subscription(vesc_sub)
-                    if self.vesc_status_subscribers.get(vesc):
-                        del self.vesc_status_subscribers[vesc]
-                    if self.vesc_voltages.get(vesc):
-                        del self.vesc_voltages[vesc]
+        # check if we have old, inactive vescs
+        vescs_to_destroy = []
+        for vesc in self.vesc_status_subscribers:
+            if vesc not in topics_list:
+                vescs_to_destroy.append(vesc)
+        for vesc in vescs_to_destroy:
+            self.destroy_subscription(self.vesc_status_subscribers[vesc])
+            del self.vesc_status_subscribers[vesc]
+            if self.vesc_voltages.get(vesc):
+                del self.vesc_voltages[vesc]
 
     def publish_battery_percentage(self):
         # get vesc status topics. If there are new ones, register subs to them and get the data
@@ -123,11 +106,11 @@ class BatteryStatus(Node):
             upper_volt = self.key_voltages[i][0]
             upper_percentage = self.key_voltages[i][1]
 
-            if i == last_index-1:
+            if i == last_index - 1:
                 return float(upper_percentage)
 
-            lower_volt = self.key_voltages[i+1][0]
-            lower_percentage = self.key_voltages[i+1][1]
+            lower_volt = self.key_voltages[i + 1][0]
+            lower_percentage = self.key_voltages[i + 1][1]
             if i == 0 and curr_voltage > upper_volt:
                 return float(upper_percentage)
             elif upper_volt > curr_voltage > lower_volt:
