@@ -71,7 +71,9 @@ class BatteryStatus(Node):
         # check if we have new vescs
         for topic in topics_list:
             vesc_from_current_topic = self.vesc_from_topic(topic)
+            print(vesc_from_current_topic)
             if vesc_from_current_topic not in self.vesc_status_subscribers.keys():
+                print('new sub')
                 self.create_new_status_sub(topic, vesc_from_current_topic)
 
         # check if we have old, inactive vescs
@@ -90,9 +92,11 @@ class BatteryStatus(Node):
         vesc_status_topics = self.get_vesc_status_topics()
         self.get_vesc_status_subscribers(vesc_status_topics)
 
-        print(vesc_status_topics)
+        # print(self.vesc_status_subscribers)
 
-        print(self.vesc_status_subscribers)
+        # print(self.vesc_voltages)
+
+        # print()
 
         mean_battery_voltage = self.get_mean_battery_voltage()
 
