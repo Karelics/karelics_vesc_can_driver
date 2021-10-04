@@ -100,7 +100,7 @@ class BatteryStatus(Node):
         active_vesc_status_topics = self.get_vesc_status_topics()
         active_vescs = self.get_vescs_from_status_topics(active_vesc_status_topics)
 
-        self.create_new_vescs_status_subs(active_vesc_status_topics)
+        self.create_new_vesc_status_subs(active_vesc_status_topics)
 
         print("existing subs after adding new ones: ", list(self.vesc_status_subscribers.keys()))
         print("found vescs: ", active_vescs)
