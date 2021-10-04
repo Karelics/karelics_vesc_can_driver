@@ -91,8 +91,8 @@ class BatteryStatus(Node):
 
         for vesc in vescs_to_destroy:
             self.destroy_subscription(self.vesc_status_subscribers[vesc])
-            if self.vesc_status_subscribers.get(vesc):
-                del self.vesc_status_subscribers[vesc]
+            print(self.vesc_status_subscribers[vesc])
+            del self.vesc_status_subscribers[vesc]
             if self.vesc_voltages.get(vesc):
                 del self.vesc_voltages[vesc]
 
