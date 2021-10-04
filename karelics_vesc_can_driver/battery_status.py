@@ -72,9 +72,13 @@ class BatteryStatus(Node):
         for topic in topics_list:
             vesc_from_current_topic = self.vesc_from_topic(topic)
             print(vesc_from_current_topic)
-            if vesc_from_current_topic not in self.vesc_status_subscribers.keys():
-                print('new sub')
+            print(type(vesc_from_current_topic))
+            print(self.vesc_status_subscribers.keys())
+            print(type(list(self.vesc_status_subscribers.keys())[0]))
+            if vesc_from_current_topic not in list(self.vesc_status_subscribers.keys()):
+                print("new sub")
                 self.create_new_status_sub(topic, vesc_from_current_topic)
+            print()
 
         # check if we have old, inactive vescs
         vescs_to_destroy = []
