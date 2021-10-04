@@ -71,25 +71,23 @@ class BatteryStatus(Node):
         # check if we have new vescs
         for topic in topics_list:
             vesc_from_current_topic = self.vesc_from_topic(topic)
-            print(vesc_from_current_topic)
-            print(type(vesc_from_current_topic))
-            print(self.vesc_status_subscribers.keys())
-            print(type(list(self.vesc_status_subscribers.keys())[0]))
-            if vesc_from_current_topic not in list(self.vesc_status_subscribers.keys()):
-                print("new sub")
+            if vesc_from_current_topic not in self.vesc_status_subscribers.keys():
                 self.create_new_status_sub(topic, vesc_from_current_topic)
-            print()
 
         # check if we have old, inactive vescs
         vescs_to_destroy = []
-        for vesc in self.vesc_status_subscribers:
+        for vesc in list(self.vesc_status_subscribers.keys()):
             if vesc not in topics_list:
                 vescs_to_destroy.append(vesc)
+        print(vescs_to_destroy)
         for vesc in vescs_to_destroy:
             self.destroy_subscription(self.vesc_status_subscribers[vesc])
-            del self.vesc_status_subscribers[vesc]
+            if self.vesc_status_subscribers.get(vesc):
+                del self.vesc_status_subscribers[vesc]
             if self.vesc_voltages.get(vesc):
                 del self.vesc_voltages[vesc]
+
+        print(self.vesc_status_subscribers)
 
     def publish_battery_percentage(self):
         # get vesc status topics. If there are new ones, register subs to them and get the data
