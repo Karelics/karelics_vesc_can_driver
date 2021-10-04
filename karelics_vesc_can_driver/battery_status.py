@@ -91,7 +91,6 @@ class BatteryStatus(Node):
 
         for vesc in vescs_to_destroy:
             self.destroy_subscription(self.vesc_status_subscribers[vesc])
-            print(self.vesc_status_subscribers[vesc])
             del self.vesc_status_subscribers[vesc]
             if self.vesc_voltages.get(vesc):
                 del self.vesc_voltages[vesc]
@@ -109,6 +108,9 @@ class BatteryStatus(Node):
 
         print("subs after destroying: ", list(self.vesc_status_subscribers.keys()))
         print()
+
+        if len(active_vescs) == 0:
+            return
 
         mean_battery_voltage = self.get_mean_battery_voltage()
 
