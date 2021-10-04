@@ -49,8 +49,7 @@ class BatteryStatus(Node):
         except (NodeNameNonExistentError, RuntimeError):
             return vesc_status_topics
 
-        string_topic_format = re.compile(
-            r'/vesc_(\d+)/status')  # RegEx template to find all existing vesc status topics
+        string_topic_format = re.compile(r'/vesc_(\d+)/status')  # RegEx template to find all vesc status topics
 
         for topic_tuple in topics_and_types:
             if string_topic_format.match(topic_tuple[0]):
@@ -90,6 +89,8 @@ class BatteryStatus(Node):
         # get vesc status topics. If there are new ones, register subs to them and get the data
         vesc_status_topics = self.get_vesc_status_topics()
         self.get_vesc_status_subscribers(vesc_status_topics)
+
+        print(vesc_status_topics)
 
         print(self.vesc_status_subscribers)
 
