@@ -86,9 +86,6 @@ class BatteryStatus(Node):
         for vesc in list(self.vesc_status_subscribers.keys()):
             if vesc not in active_vescs:
                 vescs_to_destroy.append(vesc)
-
-        print("vescs for destroying: ", vescs_to_destroy)
-
         for vesc in vescs_to_destroy:
             self.destroy_subscription(self.vesc_status_subscribers[vesc])
             del self.vesc_status_subscribers[vesc]
@@ -101,13 +98,7 @@ class BatteryStatus(Node):
 
         self.create_new_vesc_status_subs(active_vesc_status_topics)
 
-        print("existing subs after adding new ones: ", list(self.vesc_status_subscribers.keys()))
-        print("found vescs: ", active_vescs)
-
         self.destroy_stale_vesc_status_subs(active_vescs)
-
-        print("subs after destroying: ", list(self.vesc_status_subscribers.keys()))
-        print()
 
         if len(active_vescs) == 0:
             return
