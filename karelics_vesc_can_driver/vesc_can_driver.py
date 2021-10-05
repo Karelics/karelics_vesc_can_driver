@@ -3,9 +3,8 @@
 from typing import List, Union
 import sys
 
-from rclpy.executors import MultiThreadedExecutor
-from rclpy.node import Node
 import rclpy
+from rclpy.node import Node
 
 from can_msgs.msg import Frame
 
@@ -188,17 +187,18 @@ class VescCanDriver(Node):
         except NameError as e:
             self.get_logger().info(str(e))
 
-        # Publish the current status of the vescs in to ros world
-        # TODO Why do we do this for all the vescs? Should we process tick only for the current_vesc?
-        for vesc in self.known_vescs:
-            vesc.tick()
+        # Publish the current status of the current vesc in to ros world
+        current_vesc.tick()
 
         self.current_monitor.tick(self.known_vescs)
 
 
 if __name__ == '__main__':
     rclpy.init(args=sys.argv)
+
     karelics_vesc_can_driver_node = VescCanDriver()
+
     rclpy.spin(karelics_vesc_can_driver_node)
+
     karelics_vesc_can_driver_node.destroy_node()
     rclpy.shutdown()

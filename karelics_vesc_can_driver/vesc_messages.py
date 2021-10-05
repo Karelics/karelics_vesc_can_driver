@@ -518,7 +518,7 @@ class VescSetHandbrakeCurrent(CanMsg):
 
 class VescSetRPM(CanMsg):
 
-    def __init__(self, rpm=0.0):
+    def __init__(self, rpm=0):
         super(VescSetRPM, self).__init__(msg_id=CanIds.CAN_PACKET_SET_RPM)
         self.rpm = rpm
 
