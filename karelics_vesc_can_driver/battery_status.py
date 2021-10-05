@@ -215,7 +215,10 @@ class BatteryStatus(Node):
 
 if __name__ == '__main__':
     rclpy.init(args=sys.argv)
+
     battery_status_node = BatteryStatus()
+
     rclpy.spin(battery_status_node)
+
     battery_status_node.destroy_node()
     rclpy.shutdown()

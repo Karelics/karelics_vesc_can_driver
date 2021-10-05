@@ -195,7 +195,10 @@ class VescCanDriver(Node):
 
 if __name__ == '__main__':
     rclpy.init(args=sys.argv)
+
     karelics_vesc_can_driver_node = VescCanDriver()
+
     rclpy.spin(karelics_vesc_can_driver_node)
+
     karelics_vesc_can_driver_node.destroy_node()
     rclpy.shutdown()
