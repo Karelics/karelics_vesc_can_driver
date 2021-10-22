@@ -152,6 +152,7 @@ class Vesc:
         self.status_pub.publish(status_msg)
 
         if self._get_imu_data:
+            print(f"publishing IMU data from vesc {self.vesc_id}")
             self.publish_imu_data()
             self.request_imu_data()
 
