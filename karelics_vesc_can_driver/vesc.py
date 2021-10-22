@@ -85,17 +85,17 @@ class Vesc:
 
     def enable_imu_cb(self, request, _):
         if self._get_imu_data == request.data:
-            return SetBool.Response(data=self._get_imu_data, message="State unchanged")
+            return SetBool.Response(success=self._get_imu_data, message="State unchanged")
 
         if not request.data:
             self._get_imu_data = False
-            return SetBool.Response(data=self._get_imu_data, message="Stopped")
+            return SetBool.Response(success=self._get_imu_data, message="Stopped")
 
         if self.lock(self.vesc_id):
             self._get_imu_data = request.data
-            return SetBool.Response(data=True, message="Enabled IMU")
+            return SetBool.Response(success=True, message="Enabled IMU")
         else:
-            return SetBool.Response(data=False, message="Could not acquire lock other vesc IMU active?")
+            return SetBool.Response(success=False, message="Could not acquire lock other vesc IMU active?")
 
     def data_recieved(self):
         self._request_send = False
