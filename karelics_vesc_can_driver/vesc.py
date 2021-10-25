@@ -157,8 +157,8 @@ class Vesc:
         self.status_pub.publish(status_msg)
 
         if self._get_imu_data:
-            self.request_imu_data()
             self.publish_imu_data()
+            self.request_imu_data()
 
     def set_send_cb(self, send_function):
         self.send_cb = send_function
