@@ -107,7 +107,12 @@ class Vesc:
             self.send_cb(msg.get_can_msg(self.vesc_id))
 
     def publish_imu_data(self):
+        msg = VescIMUData()
+        self.send_cb(msg.get_can_msg(self.vesc_id))
+
         if not self._request_send:
+            print(f"publishing new IMU data from vesc {self.vesc_id}")
+
             imu_msg = Imu()
             imu_msg.header = Header()
             imu_msg.header.frame_id = "vesc_%i_frame" % self.vesc_id
@@ -152,9 +157,8 @@ class Vesc:
         self.status_pub.publish(status_msg)
 
         if self._get_imu_data:
-            print(f"publishing IMU data from vesc {self.vesc_id}")
-            self.publish_imu_data()
             self.request_imu_data()
+            self.publish_imu_data()
 
     def set_send_cb(self, send_function):
         self.send_cb = send_function

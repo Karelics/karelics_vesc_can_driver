@@ -36,7 +36,6 @@ class CanMessageHandler:
         self.known_messages.append(msg)
 
     def process_message(self, msg_id: int, data: bytes) -> Union[None, CanMsg]:
-
         # todo: add check to see if the buffer position is strictly increasing
         if msg_id == self._append_msg_id_short:
             # buffer position is a short so remove first bite
