@@ -107,8 +107,8 @@ class Vesc:
             self.send_cb(msg.get_can_msg(self.vesc_id))
 
     def publish_imu_data(self):
-        # msg = VescIMUData()
-        # self.send_cb(msg.get_can_msg(self.vesc_id))
+        msg = VescIMUData()
+        self.send_cb(msg.get_can_msg(self.vesc_id))
 
         if not self._request_send:
             print(f"publishing new IMU data from vesc {self.vesc_id}")
