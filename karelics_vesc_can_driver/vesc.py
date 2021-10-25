@@ -98,15 +98,18 @@ class Vesc:
             return SetBool.Response(success=False, message="Could not acquire lock other vesc IMU active?")
 
     def data_recieved(self):
+        print("in data_received, should change self._request_send")
         self._request_send = False
 
     def request_imu_data(self):
+        print(f"self._request_send in request_imu {self._request_send}")
         if not self._request_send:
             self._request_send = True
             msg = VescIMUData()
             self.send_cb(msg.get_can_msg(self.vesc_id))
 
     def publish_imu_data(self):
+        print(f"self._request_send in publish_imu {self._request_send}")
         if not self._request_send:
             print(f"publishing new IMU data from vesc {self.vesc_id}")
 
