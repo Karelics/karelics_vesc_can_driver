@@ -197,7 +197,8 @@ if __name__ == '__main__':
 
     karelics_vesc_can_driver_node = VescCanDriver()
 
-    rclpy.spin(karelics_vesc_can_driver_node)
-
-    karelics_vesc_can_driver_node.destroy_node()
-    rclpy.shutdown()
+    try:
+        rclpy.spin(karelics_vesc_can_driver_node)
+    except KeyboardInterrupt:
+        karelics_vesc_can_driver_node.destroy_node()
+        rclpy.shutdown()
