@@ -89,6 +89,7 @@ class Vesc:
 
         if not request.data:
             self._get_imu_data = False
+            self.release()
             return SetBool.Response(success=self._get_imu_data, message="Stopped")
 
         if self.lock(self.vesc_id):

@@ -446,7 +446,7 @@ class VescIMUData(ComMsg):
         return self
 
     def update_vesc_state(self, vesc):
-        print("updating vesc state in IMU message class")
+        print(f"updating vesc state in IMU message class for vesc id {vesc.vesc_id}")
         # This is a multi package message so tell the vesc that it is not waiting
         vesc.data_recieved()
         # Update state
