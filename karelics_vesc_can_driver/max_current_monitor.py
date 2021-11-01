@@ -13,7 +13,11 @@ class MonitorMaxCurrent:
     during the time-window of max_draw_time*2 we check how many times have have
     crossed cont_current_lim. If more than half of the times, the motor is set on cool-down.
     This is required to monitor max discharge correctly also during fast spikes.
-    TODO: Currently only set_erpm and set_rpm functions use this in vesc.py.
+    TODO: For now the MonitorMaxCurrent is not used anymore as we are letting the VESC take care
+     of the overcurrents
+    TODO: If at any point in the future we will again want to use the max current monitor we need to
+     remember to scale the continous current limit with the current duty cycle that each motor is driven
+     with, as DUTY_CYCLE*MOTOR_CURRENT=BATTERY_CURRENT and that is what needs to be limited.
     """
 
     def __init__(self, node: Node, cont_current_lim, max_draw_time=2.0):
