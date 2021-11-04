@@ -10,8 +10,7 @@ from karelics_vesc_can_driver.vesc_messages import *
 
 class Vesc:
 
-    def __init__(self, node: Node, vesc_id, send_function, lock_function, release_function, motor_poles, gear_ratio,
-                 current_monitor):
+    def __init__(self, node: Node, vesc_id, send_function, lock_function, release_function, motor_poles, gear_ratio):
 
         self.node = node
 
@@ -21,7 +20,6 @@ class Vesc:
 
         self.motor_poles = int(motor_poles)
         self.gear_ratio = float(gear_ratio)
-        self.current_monitor = current_monitor
 
         # Status message
         self.erpm = 0
@@ -231,8 +229,6 @@ class Vesc:
             self.node.get_logger().error(str(e))
 
     def set_erpm_cb(self, msg: Float32):
-        if not self.current_monitor.is_safe():
-            msg.data = 0.0
         rpm_msg = VescSetRPM(rpm=msg.data)
         try:
             can_frame = rpm_msg.get_can_msg(self.vesc_id)
@@ -241,8 +237,6 @@ class Vesc:
             self.node.get_logger().error(str(e))
 
     def set_rpm_cb(self, msg: Float32):
-        if not self.current_monitor.is_safe():
-            msg.data = 0.0
         rpm_msg = VescSetRPM(rpm=float(msg.data * (self.motor_poles / 2) * self.gear_ratio))
         try:
             can_frame = rpm_msg.get_can_msg(self.vesc_id)

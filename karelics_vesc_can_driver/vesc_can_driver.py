@@ -10,7 +10,6 @@ from can_msgs.msg import Frame
 
 from karelics_vesc_can_driver.vesc_messages import *
 from karelics_vesc_can_driver.vesc import *
-from karelics_vesc_can_driver.max_current_monitor import MonitorMaxCurrent
 
 
 class CanMessageHandler:
@@ -84,9 +83,6 @@ class VescCanDriver(Node):
         self.declare_parameter('gear_ratio')
         self.gear_ratio = float(self.get_parameter('gear_ratio').value)
 
-        self.declare_parameter('continuous_current_limit')
-        self.cont_current_lim = int(self.get_parameter('continuous_current_limit').value)
-
         self.get_logger().info('Starting vesc can driver')
 
         # Subscribe to can topics
@@ -132,9 +128,6 @@ class VescCanDriver(Node):
         self.can_msg_handler.register_message(self.vesc_set_hb_msg)
         self.can_msg_handler.register_message(self.vesc_get_imu_data_msg)
 
-        # Set Current monitor to ensure battery health
-        self.current_monitor = MonitorMaxCurrent(node=self, cont_current_lim=self.cont_current_lim)
-
     def aquire_vesc_tool_id_lock(self, vesc_id):
         if self._active_vesc_id and self._active_vesc_id != vesc_id:
             return False
@@ -166,8 +159,7 @@ class VescCanDriver(Node):
                                              lock_function=self.aquire_vesc_tool_id_lock,
                                              release_function=self.release_vesc_tool_id_lock,
                                              motor_poles=self.motor_poles,
-                                             gear_ratio=self.gear_ratio,
-                                             current_monitor=self.current_monitor))
+                                             gear_ratio=self.gear_ratio))
         else:
             if self._active_vesc_id:
                 vesc_id = self._active_vesc_id
@@ -188,8 +180,6 @@ class VescCanDriver(Node):
 
         # Publish the current status of the current vesc in to ros world
         current_vesc.tick()
-
-        self.current_monitor.tick(self.known_vescs)
 
 
 if __name__ == '__main__':

@@ -20,7 +20,6 @@ def launch_setup(context, *args, **kwargs):
 
     motor_poles = LaunchConfiguration('motor_poles').perform(context)
     gear_ratio = LaunchConfiguration('gear_ratio').perform(context)
-    continuous_current_limit = LaunchConfiguration('continuous_current_limit').perform(context)
 
     emulate_tty_declare = DeclareLaunchArgument(
         'emulate_tty',
@@ -53,8 +52,7 @@ def launch_setup(context, *args, **kwargs):
         output='screen',
         emulate_tty=emulate_tty,
         parameters=[{'motor_poles': motor_poles,
-                     'gear_ratio': gear_ratio,
-                     'continuous_current_limit': continuous_current_limit}],
+                     'gear_ratio': gear_ratio}],
     )
 
     battery_status = Node(
@@ -81,6 +79,5 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('motor_poles'),
         DeclareLaunchArgument('gear_ratio'),
-        DeclareLaunchArgument('continuous_current_limit'),
         OpaqueFunction(function=launch_setup),
     ])
