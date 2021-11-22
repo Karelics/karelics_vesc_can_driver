@@ -476,7 +476,7 @@ class VescSetDuty(CanMsg):
 
     def get_encoded_msg(self):
         self.start_msg()
-        self.encode_int32(int(self.duty_cycle * 100000))
+        self.encode_int32(int(self.duty_cycle * 1e5))
         return self.out_buffer
 
 
@@ -488,7 +488,7 @@ class VescSetCurrent(CanMsg):
 
     def get_encoded_msg(self):
         self.start_msg()
-        self.encode_int32(int(self.current * 1000))
+        self.encode_int32(int(self.current * 1e3))
         return self.out_buffer
 
 
@@ -500,7 +500,7 @@ class VescSetBrakeCurrent(CanMsg):
 
     def get_encoded_msg(self):
         self.start_msg()
-        self.encode_int32(int(self.current * 1000))
+        self.encode_int32(int(self.current * 1e3))
         return self.out_buffer
 
 
@@ -512,7 +512,7 @@ class VescSetHandbrakeCurrent(CanMsg):
 
     def get_encoded_msg(self):
         self.start_msg()
-        self.encode_int32(int(self.current*1000))
+        self.encode_int32(int(self.current * 1e3))
         return self.out_buffer
 
 
@@ -536,7 +536,7 @@ class VescSetPos(CanMsg):
 
     def get_encoded_msg(self):
         self.start_msg()
-        self.encode_int32(int(self.pos))
+        self.encode_int32(int(self.pos * 1e6))
         return self.out_buffer
 
 
@@ -552,7 +552,7 @@ class VescSetCurrentRel(CanMsg):
 
     def get_encoded_msg(self):
         self.start_msg()
-        self.encode_float32(int(self.current))
+        self.encode_int32(int(self.current * 1e5))
         return self.out_buffer
 
 
