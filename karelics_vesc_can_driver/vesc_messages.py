@@ -540,6 +540,10 @@ class VescSetPos(CanMsg):
         return self.out_buffer
 
 
+# TODO: this message type has never been tested nor is it made available to outside ROS nodes through the
+#       subscribed topic. Corresponding subscribed topic needs to be created along with the necessary cb
+#       function and the functionality should be then tested.
+
 class VescSetCurrentRel(CanMsg):
     """
     Set current relative to the minimum and maximum current limits.
