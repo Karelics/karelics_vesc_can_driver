@@ -4,12 +4,11 @@ from std_srvs.srv import SetBool
 
 from rclpy.node import Node
 
-from karelics_vesc_can_driver.msg import VescStatus
+from karelics_vesc_can_driver.msg import VescStatus, VescStatus2, VescStatus3, VescStatus4, VescStatus5
 from karelics_vesc_can_driver.vesc_messages import *
 
 
 class Vesc:
-
     def __init__(self, node: Node, vesc_id, send_function, lock_function, release_function, motor_poles, gear_ratio):
 
         self.node = node
@@ -25,20 +24,25 @@ class Vesc:
         self.erpm = 0
         self.duty_cycle = 0.0
         self.current = 0.0
+
         # Status message 2
         self.amp_hours = 0.0
         self.amp_hours_charged = 0.0
+
         # Status message 3
         self.watt_hours = 0.0
         self.watt_hours_charged = 0.0
+
         # Status message 4
         self.temp_fet = 0.0
         self.temp_motor = 0.0
         self.current_in = 0.0
         self.pid_pos_now = 0.0
+
         # Status message 5
         self.tacho_value = 0.0
         self.v_in = 0.0
+
         # Imu message
         self.roll = 0.0
         self.pitch = 0.0
@@ -58,24 +62,30 @@ class Vesc:
         self.q3 = 0.0
 
         # Subscribe to cmd topics
-        self.node.create_subscription(Float32, f'vesc_{self.vesc_id}/set/current', self.set_current_cb, qos_profile=1)
-        self.node.create_subscription(Float32, f'vesc_{self.vesc_id}/set/brake_current', self.set_brake_cb,
-                                      qos_profile=1)
-        self.node.create_subscription(Float32, f'vesc_{self.vesc_id}/set/handbrake_current',
-                                      self.set_handbrake_current_cb,
-                                      qos_profile=1)
-        self.node.create_subscription(Float32, f'vesc_{self.vesc_id}/set/duty_cycle', self.set_duty_cycle_cb,
-                                      qos_profile=1)
-        self.node.create_subscription(Float32, f'vesc_{self.vesc_id}/set/position', self.set_position_cb, qos_profile=1)
-        self.node.create_subscription(Float32, f'vesc_{self.vesc_id}/set/erpm', self.set_erpm_cb, qos_profile=1)
-        self.node.create_subscription(Float32, f'vesc_{self.vesc_id}/set/rpm', self.set_rpm_cb, qos_profile=1)
+        self.node.create_subscription(Float32, f"vesc_{self.vesc_id}/set/current", self.set_current_cb, qos_profile=1)
+        self.node.create_subscription(
+            Float32, f"vesc_{self.vesc_id}/set/brake_current", self.set_brake_cb, qos_profile=1
+        )
+        self.node.create_subscription(
+            Float32, f"vesc_{self.vesc_id}/set/handbrake_current", self.set_handbrake_current_cb, qos_profile=1
+        )
+        self.node.create_subscription(
+            Float32, f"vesc_{self.vesc_id}/set/duty_cycle", self.set_duty_cycle_cb, qos_profile=1
+        )
+        self.node.create_subscription(Float32, f"vesc_{self.vesc_id}/set/position", self.set_position_cb, qos_profile=1)
+        self.node.create_subscription(Float32, f"vesc_{self.vesc_id}/set/erpm", self.set_erpm_cb, qos_profile=1)
+        self.node.create_subscription(Float32, f"vesc_{self.vesc_id}/set/rpm", self.set_rpm_cb, qos_profile=1)
 
-        # Setup vesc status Publisher
-        self.status_pub = self.node.create_publisher(VescStatus, f'vesc_{self.vesc_id}/status', qos_profile=1)
-        self.imu_pub = self.node.create_publisher(Imu, f'vesc_{self.vesc_id}/imu_data', qos_profile=1)
+        # Create VESC status messages Publisher
+        self.status_pub = self.node.create_publisher(VescStatus, f"vesc_{self.vesc_id}/status", qos_profile=1)
+        self.status_2_pub = self.node.create_publisher(VescStatus2, f"vesc_{self.vesc_id}/status_2", qos_profile=1)
+        self.status_3_pub = self.node.create_publisher(VescStatus3, f"vesc_{self.vesc_id}/status_3", qos_profile=1)
+        self.status_4_pub = self.node.create_publisher(VescStatus4, f"vesc_{self.vesc_id}/status_4", qos_profile=1)
+        self.status_5_pub = self.node.create_publisher(VescStatus5, f"vesc_{self.vesc_id}/status_5", qos_profile=1)
 
-        # Enable IMU
-        self.node.create_service(SetBool, f'vesc_{self.vesc_id}/enable_imu', self.enable_imu_cb)
+        # Enable IMU service and publisher
+        self.imu_pub = self.node.create_publisher(Imu, f"vesc_{self.vesc_id}/imu_data", qos_profile=1)
+        self.node.create_service(SetBool, f"vesc_{self.vesc_id}/enable_imu", self.enable_imu_cb)
 
         self.send_cb = send_function
         self.lock = lock_function
@@ -95,7 +105,7 @@ class Vesc:
         else:
             return SetBool.Response(data=False, message="Could not acquire lock other vesc IMU active?")
 
-    def data_recieved(self):
+    def data_received(self):
         self._request_send = False
 
     def request_imu_data(self):
@@ -126,29 +136,47 @@ class Vesc:
 
             self.imu_pub.publish(imu_msg)
 
-    def tick(self):
+    def publish_status(self):
         status_msg = VescStatus()
-        status_msg.header = Header()
         status_msg.header.stamp = self.node.get_clock().now().to_msg()
-
         status_msg.erpm = int(self.erpm)
         status_msg.rpm = int(self.erpm / (self.motor_poles / 2) / self.gear_ratio)
         status_msg.duty_cycle = self.duty_cycle
         status_msg.current = self.current
+        self.status_pub.publish(status_msg)
+
+    def publish_status_2(self):
+        status_msg = VescStatus2()
+        status_msg.header.stamp = self.node.get_clock().now().to_msg()
         status_msg.amp_hours = self.amp_hours
         status_msg.amp_hours_charged = self.amp_hours_charged
+        self.status_2_pub.publish(status_msg)
+
+    def publish_status_3(self):
+        status_msg = VescStatus3()
+        status_msg.header.stamp = self.node.get_clock().now().to_msg()
         status_msg.watt_hours = self.watt_hours
         status_msg.watt_hours_charged = self.watt_hours_charged
+        self.status_3_pub.publish(status_msg)
+
+    def publish_status_4(self):
+        status_msg = VescStatus4()
+        status_msg.header.stamp = self.node.get_clock().now().to_msg()
         status_msg.temp_fet = self.temp_fet
         status_msg.temp_motor = self.temp_motor
         status_msg.current_in = self.current_in
         status_msg.pid_pos_now = self.pid_pos_now
+        self.status_4_pub.publish(status_msg)
+
+    def publish_status_5(self):
+        status_msg = VescStatus5()
+        status_msg.header.stamp = self.node.get_clock().now().to_msg()
         status_msg.tacho_value = float(self.tacho_value)
         status_msg.v_in = float(self.v_in)
         status_msg.rotations = float(self.tacho_value / self.motor_poles / 3 / self.gear_ratio)
+        self.status_5_pub.publish(status_msg)
 
-        self.status_pub.publish(status_msg)
-
+    def handle_imu_data(self):
         if self._get_imu_data:
             self.publish_imu_data()
             self.request_imu_data()
@@ -161,8 +189,12 @@ class Vesc:
         string += "erpm: %i duty: %f  current: %i  \n" % (self.erpm, self.duty_cycle, self.current)
         string += "amp_hours: %i amp_hours_charged: %f \n" % (self.amp_hours, self.amp_hours_charged)
         string += "watt_hours: %i watt_hours_charged: %f \n" % (self.watt_hours, self.watt_hours_charged)
-        string += "temp_fet: %f temp_motor: %f current_in: %f " \
-                  "pid_pos_now: %f  \n" % (self.temp_fet, self.temp_motor, self.current_in, self.pid_pos_now)
+        string += "temp_fet: %f temp_motor: %f current_in: %f " "pid_pos_now: %f  \n" % (
+            self.temp_fet,
+            self.temp_motor,
+            self.current_in,
+            self.pid_pos_now,
+        )
         string += "tacho_value: %f v_in: %f \n" % (self.tacho_value, self.v_in)
         string += "== IMU VALUES ==\n"
         string += "vesc.roll %f \n" % self.roll

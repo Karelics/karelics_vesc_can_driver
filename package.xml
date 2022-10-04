@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>karelics_vesc_can_driver</name>
-  <version>1.0.0</version>
+  <version>2.1.1</version>
   <description>The official Karelics ros2 package for controlling the VESC mark VI</description>
   <maintainer email="george.porusniuc@karelics.fi">George Porusniuc</maintainer>
   <maintainer email="mart.moerdijk@karelics.fi">Mart Moerdijk</maintainer>
@@ -23,8 +23,7 @@
   <depend>sensor_msgs</depend>
   <depend>std_srvs</depend>
 
-  <test_depend>ament_lint_auto</test_depend>
-  <test_depend>ament_lint_common</test_depend>
+  <test_depend>ament_cmake_nose</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

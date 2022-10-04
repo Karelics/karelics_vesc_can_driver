@@ -12,54 +12,51 @@ from launch_ros.actions import Node
 def launch_setup(context, *args, **kwargs):
     launch_list = []
 
-    interface = 'can0'
-    receiver_interval_sec = '0.01'
-    sender_timeout_sec = '0.01'
+    interface = "can0"
+    receiver_interval_sec = "0.01"
+    sender_timeout_sec = "0.01"
 
-    emulate_tty = LaunchConfiguration('emulate_tty')
+    emulate_tty = LaunchConfiguration("emulate_tty")
 
-    motor_poles = LaunchConfiguration('motor_poles').perform(context)
-    gear_ratio = LaunchConfiguration('gear_ratio').perform(context)
+    motor_poles = LaunchConfiguration("motor_poles").perform(context)
+    gear_ratio = LaunchConfiguration("gear_ratio").perform(context)
 
-    emulate_tty_declare = DeclareLaunchArgument(
-        'emulate_tty',
-        default_value='True')
+    emulate_tty_declare = DeclareLaunchArgument("emulate_tty", default_value="True")
 
     socket_can_receiver = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('ros2_socketcan'), 'launch', 'socket_can_receiver.launch.py'),
+            os.path.join(get_package_share_directory("ros2_socketcan"), "launch", "socket_can_receiver.launch.py"),
         ),
         launch_arguments=dict(
             interface=interface,
             interval_sec=receiver_interval_sec,
-        ).items()
+        ).items(),
     )
 
     socket_can_sender = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('ros2_socketcan'), 'launch', 'socket_can_sender.launch.py'),
+            os.path.join(get_package_share_directory("ros2_socketcan"), "launch", "socket_can_sender.launch.py"),
         ),
         launch_arguments=dict(
             interface=interface,
             timeout_sec=sender_timeout_sec,
-        ).items()
+        ).items(),
     )
 
     vesc_can_driver = Node(
-        package='karelics_vesc_can_driver',
-        executable='vesc_can_driver.py',
-        name='karelics_vesc_can_driver',
-        output='screen',
+        package="karelics_vesc_can_driver",
+        executable="vesc_can_driver.py",
+        name="karelics_vesc_can_driver",
+        output="screen",
         emulate_tty=emulate_tty,
-        parameters=[{'motor_poles': motor_poles,
-                     'gear_ratio': gear_ratio}],
+        parameters=[{"motor_poles": motor_poles, "gear_ratio": gear_ratio}],
     )
 
     battery_status = Node(
-        package='karelics_vesc_can_driver',
-        executable='battery_status.py',
-        name='battery_status_node',
-        output='screen',
+        package="karelics_vesc_can_driver",
+        executable="battery_status.py",
+        name="battery_status_node",
+        output="screen",
         emulate_tty=emulate_tty,
         parameters=[],
     )
@@ -76,8 +73,10 @@ def launch_setup(context, *args, **kwargs):
 
 
 def generate_launch_description():
-    return LaunchDescription([
-        DeclareLaunchArgument('motor_poles'),
-        DeclareLaunchArgument('gear_ratio'),
-        OpaqueFunction(function=launch_setup),
-    ])
+    return LaunchDescription(
+        [
+            DeclareLaunchArgument("motor_poles"),
+            DeclareLaunchArgument("gear_ratio"),
+            OpaqueFunction(function=launch_setup),
+        ]
+    )

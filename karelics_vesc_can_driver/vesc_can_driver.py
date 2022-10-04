@@ -8,6 +8,7 @@ from rclpy.node import Node
 
 from can_msgs.msg import Frame
 
+from karelics_health_monitor.topic_monitor.topic_monitor import TopicMonitor
 from karelics_vesc_can_driver.vesc_messages import *
 from karelics_vesc_can_driver.vesc import *
 
@@ -35,10 +36,10 @@ class CanMessageHandler:
         self.known_messages.append(msg)
 
     def process_message(self, msg_id: int, data: bytes) -> Union[None, CanMsg]:
-
-        # todo: add check to see if the buffer position is strictly increasing
+        # TODO: add check to see if the buffer position is strictly increasing
+        # https://karelics.myjetbrains.com/youtrack/issue/ROS-1499
         if msg_id == self._append_msg_id_short:
-            # buffer position is a short so remove first bite
+            # Buffer position is a short so remove first bite
             self._input_buffer.extend(data[1:])
             return None
 
@@ -47,8 +48,11 @@ class CanMessageHandler:
             self._input_buffer.extend(data[2:])
             return None
 
-        # todo: add check to match length and crc
+        # TODO: add check to match length and crc
+        # https://karelics.myjetbrains.com/youtrack/issue/ROS-1499
         if msg_id == self._process_buffer_msg_id:
+            # this block is taken from the vesc tool GitHub repo, seems like here they do the crc check, we could do
+            # something similar
             # payload[0] = char(254); // vesc tool node ID
             # payload[1] = char(0); // process
             # payload[2] = char(len >> 8);
@@ -58,8 +62,6 @@ class CanMessageHandler:
             msg_id = self._input_buffer[0]
             data = self._input_buffer[1:]
             self._input_buffer = bytearray()
-
-        # print(" ".join("x%02x" % i for i in data))
 
         if msg_id in self.known_messages_ids:
             return self.known_messages[self.known_messages_ids.index(msg_id)].process_msg(data)
@@ -78,16 +80,16 @@ class VescCanDriver(Node):
     def __init__(self):
         super().__init__("vesc_can_driver")
 
-        self.declare_parameter('motor_poles')
-        self.motor_poles = int(self.get_parameter('motor_poles').value)
+        self.declare_parameter("motor_poles")
+        self.motor_poles = int(self.get_parameter("motor_poles").value)
 
-        self.declare_parameter('gear_ratio')
-        self.gear_ratio = float(self.get_parameter('gear_ratio').value)
+        self.declare_parameter("gear_ratio")
+        self.gear_ratio = float(self.get_parameter("gear_ratio").value)
 
-        self.get_logger().info('Starting vesc can driver')
+        self.get_logger().info("Starting vesc can driver")
 
         # Subscribe to can topics
-        self.create_subscription(Frame, "/from_can_bus", self.can_cb, qos_profile=10)
+        from_can_bus_sub = self.create_subscription(Frame, "/from_can_bus", self.can_cb, qos_profile=20)
 
         # Make publisher to send can messages
         self.send_can_msg_pub = self.create_publisher(Frame, "/to_can_bus", qos_profile=1)
@@ -154,13 +156,17 @@ class VescCanDriver(Node):
         if vesc_id != self.vesc_tool_id:
             if vesc_id not in self.known_vesc_ids:
                 self.known_vesc_ids.append(vesc_id)
-                self.known_vescs.append(Vesc(node=self,
-                                             vesc_id=vesc_id,
-                                             send_function=self.send_can_msg_pub.publish,
-                                             lock_function=self.aquire_vesc_tool_id_lock,
-                                             release_function=self.release_vesc_tool_id_lock,
-                                             motor_poles=self.motor_poles,
-                                             gear_ratio=self.gear_ratio))
+                self.known_vescs.append(
+                    Vesc(
+                        node=self,
+                        vesc_id=vesc_id,
+                        send_function=self.send_can_msg_pub.publish,
+                        lock_function=self.aquire_vesc_tool_id_lock,
+                        release_function=self.release_vesc_tool_id_lock,
+                        motor_poles=self.motor_poles,
+                        gear_ratio=self.gear_ratio,
+                    )
+                )
         else:
             if self._active_vesc_id:
                 vesc_id = self._active_vesc_id
@@ -180,10 +186,20 @@ class VescCanDriver(Node):
             self.get_logger().info(str(e))
 
         # Publish the current status of the current vesc in to ros world
-        current_vesc.tick()
+        if can_msg_id == CanIds.CAN_PACKET_STATUS:
+            current_vesc.publish_status()
+        if can_msg_id == CanIds.CAN_PACKET_STATUS_2:
+            current_vesc.publish_status_2()
+        if can_msg_id == CanIds.CAN_PACKET_STATUS_3:
+            current_vesc.publish_status_3()
+        if can_msg_id == CanIds.CAN_PACKET_STATUS_4:
+            current_vesc.publish_status_4()
+        if can_msg_id == CanIds.CAN_PACKET_STATUS_5:
+            current_vesc.publish_status_5()
+        current_vesc.handle_imu_data()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     rclpy.init(args=sys.argv)
 
     karelics_vesc_can_driver_node = VescCanDriver()

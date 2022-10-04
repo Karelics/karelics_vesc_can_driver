@@ -104,6 +104,7 @@ class CanIds(IntEnum):
     Can id's from:
     https://github.com/vedderb/vesc_tool/blob/87565a40802707bcdd1432f4f470b7a4364a9a82/datatypes.h
     """
+
     CAN_PACKET_SET_DUTY = 0
     CAN_PACKET_SET_CURRENT = 1
     CAN_PACKET_SET_CURRENT_BRAKE = 2
@@ -140,7 +141,7 @@ class CanIds(IntEnum):
 
 class CanMsg(metaclass=ABCMeta):
     """
-    Interface defining the common functions for encoding and decoding can messages from the VESC.
+    Interface defining the common functions for encoding and decoding CAN messages from the VESC.
 
     This class should not be used directly but should always be inherited from.
 
@@ -158,22 +159,22 @@ class CanMsg(metaclass=ABCMeta):
     """
 
     def pop_int32(self):
-        data = struct.unpack(">i", self.in_buffer[self.pointer:self.pointer + 4])[0]
+        data = struct.unpack(">i", self.in_buffer[self.pointer : self.pointer + 4])[0]
         self.pointer += 4
         return data
 
     def pop_int16(self):
-        data = struct.unpack(">h", self.in_buffer[self.pointer:self.pointer + 2])[0]
+        data = struct.unpack(">h", self.in_buffer[self.pointer : self.pointer + 2])[0]
         self.pointer += 2
         return data
 
     def pop_uint16(self):
-        data = struct.unpack(">H", self.in_buffer[self.pointer:self.pointer + 2])[0]
+        data = struct.unpack(">H", self.in_buffer[self.pointer : self.pointer + 2])[0]
         self.pointer += 2
         return data
 
     def pop_float32(self):
-        data = struct.unpack(">f", self.in_buffer[self.pointer:self.pointer + 4])[0]
+        data = struct.unpack(">f", self.in_buffer[self.pointer : self.pointer + 4])[0]
         self.pointer += 4
         return data
 
@@ -233,7 +234,7 @@ class CanMsg(metaclass=ABCMeta):
     @staticmethod
     def decode_frame_id(frame: Frame):
         vesc_id = frame.id & 0xFF
-        can_msg_id = (frame.id >> 8)
+        can_msg_id = frame.id >> 8
         return [vesc_id, can_msg_id]
 
     def get_encoded_msg_id(self, controller_id):
@@ -308,7 +309,6 @@ class VescStatusMsg(CanMsg):
 
 
 class VescStatus2Msg(CanMsg):
-
     def __init__(self):
         super(VescStatus2Msg, self).__init__(msg_id=CanIds.CAN_PACKET_STATUS_2)
         self.amp_hours = 0
@@ -326,7 +326,6 @@ class VescStatus2Msg(CanMsg):
 
 
 class VescStatus3Msg(CanMsg):
-
     def __init__(self):
         super(VescStatus3Msg, self).__init__(msg_id=CanIds.CAN_PACKET_STATUS_3)
         self.watt_hours = 0
@@ -344,7 +343,6 @@ class VescStatus3Msg(CanMsg):
 
 
 class VescStatus4Msg(CanMsg):
-
     def __init__(self):
         super(VescStatus4Msg, self).__init__(msg_id=CanIds.CAN_PACKET_STATUS_4)
         self.temp_fet = 0
@@ -368,7 +366,6 @@ class VescStatus4Msg(CanMsg):
 
 
 class VescStatus5Msg(CanMsg):
-
     def __init__(self):
         super(VescStatus5Msg, self).__init__(msg_id=CanIds.CAN_PACKET_STATUS_5)
         self.tacho_value = 0
@@ -386,7 +383,6 @@ class VescStatus5Msg(CanMsg):
 
 
 class VescIMUData(ComMsg):
-
     def __init__(self):
         super(VescIMUData, self).__init__(msg_id=ComPacketID.COMM_GET_IMU_DATA)
         self.roll = 0
@@ -447,7 +443,7 @@ class VescIMUData(ComMsg):
 
     def update_vesc_state(self, vesc):
         # This is a multi package message so tell the vesc that it is not waiting
-        vesc.data_recieved()
+        vesc.data_received()
         # Update state
         vesc.roll = self.roll
         vesc.pitch = self.pitch
@@ -469,7 +465,6 @@ class VescIMUData(ComMsg):
 
 # Out going messages
 class VescSetDuty(CanMsg):
-
     def __init__(self, dutycycle=0):
         super(VescSetDuty, self).__init__(msg_id=CanIds.CAN_PACKET_SET_DUTY)
         self.duty_cycle = dutycycle
@@ -481,7 +476,6 @@ class VescSetDuty(CanMsg):
 
 
 class VescSetCurrent(CanMsg):
-
     def __init__(self, current=0):
         super(VescSetCurrent, self).__init__(msg_id=CanIds.CAN_PACKET_SET_CURRENT)
         self.current = current
@@ -493,7 +487,6 @@ class VescSetCurrent(CanMsg):
 
 
 class VescSetBrakeCurrent(CanMsg):
-
     def __init__(self, current=0):
         super(VescSetBrakeCurrent, self).__init__(msg_id=CanIds.CAN_PACKET_SET_CURRENT_BRAKE)
         self.current = current
@@ -505,7 +498,6 @@ class VescSetBrakeCurrent(CanMsg):
 
 
 class VescSetHandbrakeCurrent(CanMsg):
-
     def __init__(self, current=0):
         super(VescSetHandbrakeCurrent, self).__init__(msg_id=CanIds.CAN_PACKET_SET_CURRENT_HANDBRAKE)
         self.current = current
@@ -517,7 +509,6 @@ class VescSetHandbrakeCurrent(CanMsg):
 
 
 class VescSetRPM(CanMsg):
-
     def __init__(self, rpm=0):
         super(VescSetRPM, self).__init__(msg_id=CanIds.CAN_PACKET_SET_RPM)
         self.rpm = rpm
@@ -529,7 +520,6 @@ class VescSetRPM(CanMsg):
 
 
 class VescSetPos(CanMsg):
-
     def __init__(self, pos=0):
         super(VescSetPos, self).__init__(msg_id=CanIds.CAN_PACKET_SET_POS)
         self.pos = pos
@@ -543,6 +533,7 @@ class VescSetPos(CanMsg):
 # TODO: this message type has never been tested nor is it made available to outside ROS nodes through the
 #       subscribed topic. Corresponding subscribed topic needs to be created along with the necessary cb
 #       function and the functionality should be then tested.
+
 
 class VescSetCurrentRel(CanMsg):
     """
@@ -561,7 +552,6 @@ class VescSetCurrentRel(CanMsg):
 
 
 class VescGetImuData(CanMsg):
-
     def __init__(self):
         super(VescGetImuData, self).__init__(msg_id=CanIds.CAN_PACKET_PROCESS_SHORT_BUFFER)
 
