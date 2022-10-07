@@ -1,3 +1,6 @@
+## Licensing
+This piece of software is released under the GPL 3.0 license.
+
 ## Prerequisites
 - This driver requires a working socket can setup so make sure you have one.
 - This driver relies on the `ros2_socketcan` package, so make sure you clone the latest stable version of it into your workspace from this link: https://github.com/autowarefoundation/ros2_socketcan

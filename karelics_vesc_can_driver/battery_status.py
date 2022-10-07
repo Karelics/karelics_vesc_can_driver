@@ -1,5 +1,24 @@
 #!/usr/bin/env python3
 
+#    This file contains the BatteryStatus node handling the publishing of
+#    the battery status according to the statuses of all the active VESCs
+#    in the system.
+#
+#    Copyright (C) 2022  Karelics Oy
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 from functools import partial
 import math
 import re
